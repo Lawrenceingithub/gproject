@@ -8,12 +8,12 @@ export const CartItem = (props) => {
 
   return (
     <div className="cartItem">
-      <img src={productImage} />
+      <img src={productImage} alt={productImage}/>
       <div className="description">
         <p>
           <b>{productName}</b>
         </p>
-        <p> Price: ${price}</p>
+        <p> 價值: ${price}</p>
         <div className="countHandler">
           <button onClick={() => removeFromCart(id)}> - </button>
           <input

@@ -1,0 +1,19 @@
+.userpage {
+    display: flex;
+  }
+  
+  .sidebar {
+    flex: 0 0 auto;
+    /* 其他样式属性 */
+  }
+  
+  .content {
+    flex: 1 1 auto;
+    /* 其他样式属性 */
+  }
+
+.userinfo .h1{
+  font-size: 15px;
+  flex-direction: column;
+  align-items: center;
+}
