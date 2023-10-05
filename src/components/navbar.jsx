@@ -26,7 +26,6 @@ export const Navbar = () => {
               onClick={async () => {
                 logout();
                 await navigate("/");
-                alert("成功登出");
               }}
             >
               登出

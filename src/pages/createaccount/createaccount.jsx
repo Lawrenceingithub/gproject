@@ -1,46 +1,47 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Phone,
-  AddressBook,
-  Password,
-  IdentificationCard,
-} from "phosphor-react";
+import React, { useState, useContext  } from "react";
+import { useNavigate  } from "react-router-dom";
+import { Phone, AddressBook, Password, IdentificationCard } from "phosphor-react";
+import { AuthContext } from "../../context/auth-context";
 import "./createaccount.css";
-import Axios from "axios";  
+import Axios from "axios";
 
 export const Createaccount = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [message, setMessage] = useState({ text: "", type: "" });
+  const [message, setMessage] = useState({ text: null, type: "" });
+
+  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const Submit = () => {
-    Axios.post("http://localhost:3001/createaccount", {
-      username: username,
-      password: password,
-      phone: phone,
-      address: address,
-    })
-      .then((response) => {
+  const submit = async () => {
+    if (username && password) {
+      try {
+        const response = await Axios.post("http://localhost:3001/createaccount", {
+          username: username,
+          password: password,
+          phone: phone,
+          address: address,
+        });
+  
         if (response.data.success) {
-          console.log("submit successful");
-          setMessage({ text: "提交成功", type: "success" });
-          navigate('/');
+          setMessage({ text: "帐号创建成功", type: "success" });
+          
 
+          setTimeout(() => {
+            authContext.login(username);
+            navigate("/");
+          }, 1000);
         } else {
-          setErrorMessage("Invalid information");
-          setMessage({ text: "无效的信息", type: "error" });
+          setMessage({ text: response.data.message, type: "error" }); // 显示后端返回的错误消息
         }
-      })
-      .catch((error) => {
-        console.log(error);
-        setErrorMessage("An error occurred");
+      } catch (error) {
         setMessage({ text: "发生错误", type: "error" });
-      });
+      }
+    } else {
+      setMessage({ text: "用户名和密码不能为空", type: "error" });
+    }
   };
 
   return (
@@ -84,12 +85,9 @@ export const Createaccount = () => {
           required
         />
 
-        <button onClick={Submit}>注册</button>
+        <button onClick={submit}>注册</button>
 
-        {errorMessage && <div className="error">{errorMessage}</div>}
-        {message.text && (
-          <div className={`message ${message.type}`}>{message.text}</div>
-        )}
+        {message.text !== null && <div className={`message ${message.type}`}>{message.text}</div>}
       </div>
     </div>
   );

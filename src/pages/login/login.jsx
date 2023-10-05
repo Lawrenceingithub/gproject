@@ -4,6 +4,7 @@ import { UserCircle, IdentificationCard, Password } from "phosphor-react";
 import Axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/auth-context";
+import Cookies from "js-cookie";
 
 export const Login = () => {
   const [username, setusername] = useState("");
@@ -11,6 +12,7 @@ export const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
+  const [showModal, setShowModal] = useState(false);
 
   const handleLogin = () => {
     Axios.post("http://localhost:3001/login", {
@@ -18,34 +20,32 @@ export const Login = () => {
       password: password,
     })
       .then((response) => {
-        // 根据后端返回的响应判断登录是否成功
         if (response.data.success) {
-          // 登录成功的逻辑
-          console.log("Login successful");
-          authContext.login(username); // 触发登录状态更新
+          // 设置JWT令牌作为cookie
+          Cookies.set("token", response.data.token, { expires: 1 }); // 令牌的有效期限可以根据需要进行调整
+    
+          authContext.login(username);
           if (navigate() === "/cart") {
-            navigate("/cart"); // 登录成功后返回购物车页面
+            navigate("/cart");
           } else {
-            navigate("/"); // 登录成功后返回首页
+            navigate("/");
           }
-          
         } else {
-          // 登录失败的逻辑
-          setErrorMessage("Invalid username or password");
+          setErrorMessage("无效的帐号或密码");
         }
       })
       .catch((error) => {
         console.log(error);
         setErrorMessage("An error occurred");
       });
-  };
+    };
 
   return (
     <>
       <div className="logininfo">
         <UserCircle size={150} />
         <IdentificationCard size={30} />
-        <label>用戶名:</label>
+        <label>用户名:</label>
         <input
           type="text"
           value={username}
@@ -53,7 +53,7 @@ export const Login = () => {
           required
         />
         <Password size={30} />
-        <label>密碼:</label>
+        <label>密码:</label>
         <input
           type="password"
           value={password}
@@ -61,11 +61,19 @@ export const Login = () => {
           required
         />
         <p style={{ color: "red" }}>{errorMessage}</p>
-        <button onClick={handleLogin}>登入</button>
+        <button onClick={handleLogin}>登录</button>
         <p>
-          注冊新帳號? <Link to="/createaccount">注冊</Link>
+          注册新帐号? <Link to="/createaccount">注册</Link>
         </p>
       </div>
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>登录成功</p>
+            <button onClick={() => setShowModal(false)}>关闭</button>
+          </div>
+        </div>
+      )}
     </>
   );
 };
