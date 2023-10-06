@@ -174,6 +174,27 @@ app.get("/user", async (req, res) => {
   }
 });
 
+app.post("/products", async (req, res) => {
+  const name = req.body.name;
+  const price = req.body.price;
+
+  try {
+    const connection = await getConnection();
+
+    await connection.execute(
+      "INSERT INTO products (name, price) VALUES (?, ?)",
+      [name, price]
+    );
+
+    connection.release();
+
+    res.json({ success: true, message: "商品添加成功" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "添加商品时出错" });
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is running");
 });
