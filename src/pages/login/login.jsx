@@ -10,9 +10,10 @@ export const Login = () => {
   const [username, setusername] = useState("");
   const [password, setpassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false); // 新增的状态和函数
 
   const handleLogin = () => {
     Axios.post("http://localhost:3001/login", {
@@ -21,24 +22,27 @@ export const Login = () => {
     })
       .then((response) => {
         if (response.data.success) {
-          // 设置JWT令牌作为cookie
-          Cookies.set("token", response.data.token, { expires: 1 }); // 令牌的有效期限可以根据需要进行调整
-    
+          Cookies.set("token", response.data.token, { expires: 1 });
           authContext.login(username);
+
           if (navigate() === "/cart") {
             navigate("/cart");
           } else {
             navigate("/");
           }
+          setShowModal(true); // 登录成功后显示模态框
         } else {
           setErrorMessage("无效的帐号或密码");
         }
+
+        
       })
       .catch((error) => {
         console.log(error);
         setErrorMessage("An error occurred");
       });
-    };
+  };
+
 
   return (
     <>

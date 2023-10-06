@@ -8,6 +8,9 @@ const jwt = require("jsonwebtoken");
 app.use(cors());
 app.use(express.json());
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 const dbConfig = {
   user: "root",
   host: "localhost",
@@ -70,7 +73,15 @@ app.post("/login", async (req, res) => {
         const token = generateToken(userId);
 
         res.cookie("token", token, { httpOnly: true }); // 将令牌设置为 cookie
-        res.json({ success: true, message: "登录成功" });
+        res.json({
+          success: true,
+          message: "登录成功",
+          user: {
+            username: rows[0].username,
+            phone: rows[0].phone,
+            address: rows[0].address
+          }
+        });
       } else {
         res.json({ success: false, message: "无效的帐号或密码" });
       }
@@ -107,14 +118,55 @@ app.post("/createaccount", async (req, res) => {
         "INSERT INTO userdb (username, password, phone, address) VALUES (?, ?, ?, ?)",
         [username, hashedPassword, phone, address]
       );
+      
+      const [newUser] = await connection.execute(
+        "SELECT * FROM userdb WHERE username = ?",
+        [username]
+      );
       connection.release();
-      res.json({ success: true, message: "成功注册" });
+
+            res.json({
+        success: true,
+        message: "成功注册",
+        user: {
+          username: newUser[0].username,
+          phone: newUser[0].phone,
+          address: newUser[0].address
+        }
+      });
     } catch (error) {
       connection.release();
       console.log("Hashing error:", error);
       res
         .status(500)
         .json({ success: false, message: "Error during password hashing" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+app.get("/user", async (req, res) => {
+  // 从请求中获取令牌
+  const token = req.cookies.token;
+
+  try {
+    const decodedToken = jwt.verify(token, "your_secret_key"); // 替换为您自己的密钥
+    const userId = decodedToken.userId;
+
+    const connection = await getConnection();
+    const [rows] = await connection.execute(
+      "SELECT * FROM userdb WHERE id = ?",
+      [userId]
+    );
+    connection.release();
+
+    if (rows.length > 0) {
+      const user = rows[0];
+      res.json({ success: true, user });
+    } else {
+      res.json({ success: false, message: "用户不存在" });
     }
   } catch (error) {
     console.log(error);

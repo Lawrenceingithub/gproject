@@ -7,9 +7,10 @@ export const AuthContext = createContext({
   logout: () => {},
 });
 
-export const AuthContextProvider = (props) => {
+export const AuthContextProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null); // 添加 user 状态
 
   const login = (username) => {
     setIsLoggedIn(true);
@@ -18,11 +19,24 @@ export const AuthContextProvider = (props) => {
 
   const logout = () => {
     setIsLoggedIn(false);
+    setUser(null); // 在登出时清除用户信息
+  };
+
+  const updateUser = (userData) => {
+    setUser(userData); // 更新用户信息
+  };
+
+  const authContextValue = {
+    isLoggedIn,
+    username,
+    login,
+    logout,
+    updateUser,
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, username, login, logout }}>
-      {props.children}
+    <AuthContext.Provider value={authContextValue}>
+      {children}
     </AuthContext.Provider>
   );
 };

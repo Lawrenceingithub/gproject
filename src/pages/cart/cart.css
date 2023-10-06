@@ -6,6 +6,14 @@
     align-items: center;
   }
   
+  .cartdetail {
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
   .cartItem {
     width: 700px;
     height: 250px;
@@ -23,7 +31,7 @@
   
   .cartItem .description {
     width: 100%;
-    font-size: 30px;
+    font-size: 20px;
   }
   
   .countHandler input {

@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ActiveContentContext } from './user';
+import './user.css';
 
 export const FAQ = () => {
-  const activeContent = useContext(ActiveContentContext);
   const navigate = useNavigate();
 
   const handleGoBack = () => {
@@ -11,9 +10,9 @@ export const FAQ = () => {
   };
 
   return (
-    <div>
+    <div className="FAQcontent">
       <h1>FAQ</h1>
-      <p>当前的活动内容：{activeContent}</p>
+      <p>当前的活动内容：</p>
       <button onClick={handleGoBack}>返回</button>
     </div>
   );
