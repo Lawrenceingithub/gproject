@@ -8,6 +8,7 @@ import Axios from "axios";
 export const Createaccount = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [nickname, setNickname] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [message, setMessage] = useState({ text: null, type: "" });
@@ -21,28 +22,24 @@ export const Createaccount = () => {
         const response = await Axios.post("http://localhost:3001/createaccount", {
           username: username,
           password: password,
+          nickname: nickname,
           phone: phone,
           address: address,
         });
-  
-        if (response.data.success) {
-          setMessage({ text: "帐号创建成功", type: "success" });
-          
-
-          setTimeout(() => {
-            authContext.login(username);
-            navigate("/");
-          }, 1000);
-        } else {
-          setMessage({ text: response.data.message, type: "error" }); // 显示后端返回的错误消息
-        }
+        console.log(response);
+        setMessage({ text: "註冊成功", type: "success" });
+        setTimeout(() => {
+          authContext.login(username);  // 更新 context 中的用户名
+          navigate('/');
+        }, 1000);
       } catch (error) {
-        setMessage({ text: "发生错误", type: "error" });
+        setMessage({ text: "發生錯誤", type: "error" });
       }
     } else {
-      setMessage({ text: "用户名和密码不能为空", type: "error" });
+      setMessage({ text: "用戶名和密碼不能為空", type: "error" });
     }
   };
+  
 
   return (
     <div className="createaccount">
@@ -50,6 +47,7 @@ export const Createaccount = () => {
         <div className="formtitle">
           <h1>注册表</h1>
         </div>
+        
         <IdentificationCard />
         <label>用户名:</label>
         <input
@@ -58,12 +56,22 @@ export const Createaccount = () => {
           onChange={(e) => setUsername(e.target.value)}
           required
         />
+
         <Password />
         <label>密码:</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <IdentificationCard />
+        <label>昵稱:</label>
+        <input
+          type="text"
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
           required
         />
 
