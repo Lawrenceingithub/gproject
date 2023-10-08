@@ -10,17 +10,23 @@ app.use(express.json());
 let db;  // Declare a variable to store the database connection
 
 const connectToDatabase = async () => {
-  db = await mysql.createConnection({
-    user: "root",
-    host: "localhost",
-    password: "QWEasd123",
-    database: "employeesystem",
-  });
+  try {
+    db = await mysql.createConnection({
+      user: "root",
+      host: "localhost",
+      password: "QWEasd123",
+      database: "employeesystem",
+    });
+    console.log("Database connection successful");
+  } catch (error) {
+    console.error("Error connecting to the database:", error);
+  }
 };
 
 connectToDatabase();  // Connect to the database when the server starts
 
 app.post("/login", async (req, res) => {
+  console.log("Received login request:", req.body);
   const { username, password } = req.body;
 
   try {
@@ -30,18 +36,19 @@ app.post("/login", async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (passwordMatch) {
-        res.status(200).send("Login successful");
+        res.status(200).send("登入成功");
       } else {
-        res.status(401).send("Invalid credentials");
+        res.status(401).send("密碼錯誤");
       }
     } else {
-      res.status(401).send("Invalid credentials");
+      res.status(404).send("帳號不存在");
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Error during login");
+    console.error("Server error:", error);
+    res.status(500).send("伺服器出錯");
   }
 });
+
 
 
 app.post("/createaccount", async (req, res) => {

@@ -13,25 +13,30 @@ export const Login = () => {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    Axios.post("http://localhost:3001/login", {
+  const handleLogin = async () => {
+    await Axios.post("http://localhost:3001/login", {
       username: username,
       password: password,
     })
       .then((response) => {
-        if (response.data === "Login successful") {
+        console.log(response.data);
+        if (response.status === 200 && response.data === "登入成功") {
           setTimeout(() => {
             authContext.login(username);
             alert("歡迎 " + username);
             navigate('/');
           }, 1000);
+        } else if (response.status === 401) {
+          setErrorMessage("密碼錯誤");
+        } else if (response.status === 404) {
+          setErrorMessage("帳號不存在");
         } else {
-          setErrorMessage("无效的帐号或密码");
+          setErrorMessage("報錯1");
         }
       })
       .catch((error) => {
         console.log(error);
-        setErrorMessage("An error occurred");
+        setErrorMessage("報錯2");
       });
   };
   
