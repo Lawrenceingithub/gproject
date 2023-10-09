@@ -38,7 +38,7 @@ app.post("/login", async (req, res) => {
       if (passwordMatch) {
         res.status(200).send("登入成功");
       } else {
-        res.status(401).send("密碼錯誤");
+        res.status(401).send("帳號或密碼錯誤");
       }
     } else {
       res.status(404).send("帳號不存在");
@@ -55,13 +55,11 @@ app.post("/createaccount", async (req, res) => {
   const { username, password, nickname, phone, address } = req.body;
 
   try {
-    // Check if username already exists
     const [existingUsers] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username]);
     if (existingUsers.length > 0) {
       return res.status(400).send("Username already exists");
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.execute(
@@ -78,7 +76,7 @@ app.post("/createaccount", async (req, res) => {
 
 
 app.get("/user", async (req, res) => {
-  const { userId } = req.query;  // Access userId from query parameters
+  const { userId } = req.query;
 
   try {
     const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE id = ?", [userId]);

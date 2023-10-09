@@ -1,12 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useContext, useState } from "react";
 import { AuthContext } from "../../context/auth-context";
 import Axios from "axios";
+import { Sidebar } from "../../components/sidebar";
 import "./user.css";
 
 export const User = () => {
   const { username, logout, userId } = useContext(AuthContext);
-  const navigate = useNavigate();
   const [userlist, setUserlist] = useState([]);
 
   
@@ -21,37 +20,9 @@ export const User = () => {
     }
   };
 
-
-  const headtoFAQ = () => {
-    navigate("/user/faq");
-  };
-
-  const headtoOrderhistory = () => {
-    navigate("/user/orderhistory");
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
     <div className="userpage">
-      <div className="sidebar">
-        <ul>
-          <li>
-            <Link to="/user/orderhistory" onClick={headtoOrderhistory}>
-              订单历史
-            </Link>
-          </li>
-          <li>
-            <Link to="/user/faq" onClick={headtoFAQ}>
-              FAQ
-            </Link>
-          </li>
-        </ul>
-      </div>
-
+      <Sidebar/>
       <div className="showuser">
         <button onClick={showuser}>showuser</button>
 

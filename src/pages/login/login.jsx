@@ -27,16 +27,17 @@ export const Login = () => {
             navigate('/');
           }, 1000);
         } else if (response.status === 401) {
-          setErrorMessage("密碼錯誤");
+          setErrorMessage(response.data);
         } else if (response.status === 404) {
-          setErrorMessage("帳號不存在");
+          setErrorMessage(response.data);
         } else {
-          setErrorMessage("報錯1");
+          setErrorMessage(response.data);
         }
       })
       .catch((error) => {
         console.log(error);
-        setErrorMessage("報錯2");
+        console.log(error.response);
+        setErrorMessage(error.response.data);
       });
   };
   
