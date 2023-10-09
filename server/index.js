@@ -57,7 +57,7 @@ app.post("/createaccount", async (req, res) => {
   try {
     const [existingUsers] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username]);
     if (existingUsers.length > 0) {
-      return res.status(400).send("Username already exists");
+      return res.status(400).send("用戶名存在");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -67,10 +67,10 @@ app.post("/createaccount", async (req, res) => {
       [username, hashedPassword, nickname, phone, address]
     );
 
-    res.send("Values Inserted");
+    res.send("注冊成功");
   } catch (error) {
     console.log(error);
-    res.status(500).send("Error inserting values");
+    res.status(500).send("未能成功注冊");
   }
 });
 
@@ -83,7 +83,7 @@ app.get("/user", async (req, res) => {
     res.send(rows);
   } catch (error) {
     console.log(error);
-    res.status(500).send("Error fetching data");
+    res.status(500).send("出錯");
   }
 });
 
