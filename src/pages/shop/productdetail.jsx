@@ -1,52 +1,41 @@
-import {useParams, Link} from "react-router-dom"
-import { useState,useEffect } from "react"
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+import { PRODUCTS } from "../../products";
 
-export default function ProductDetail() {
+export const ProductDetail = () => {
+  let params = useParams();
+  const productId = parseInt(params.id);
 
-    let params = useParams()
-    let [productDetail,setProductDetail] = useState(null)
+  const productDetail = PRODUCTS.find((product) => product.id === productId);
 
-    useEffect(()=>{
+  if (!productDetail) {
+    return <div>產品不存在</div>;
+  }
 
-        //1 : 無第二個參數 : component每次render都會觸發
-        //2 : Dependency Array是空array時 : 只會在第一次網頁render時會觸發
-        //3 : Dependency Array是有變數時 : 第一次網頁render時 + 指定的變數改變 會觸發
-        fetch('https://hoyinleung.github.io/demoapi/react-basic-product.json')
-            .then(response => response.json())
-            .then(data => {
-                let productInfo = data.find((element)=>{
-                    return element.id === parseInt(params.id)
-                })
-                setProductDetail(productInfo)
-            })
-    },[params.id]) // <==  Dependency Array
+  return (
+    <div>
+      <div className="ProductDetail">
+        <table width="100%">
+          <tbody>
+            <tr>
+              <td align="right">
+                <img
+                  src={productDetail.productImage}
+                  alt={productDetail.productName}
+                  width="400"
+                />
+              </td>
+              <td width="45%" style={{ padding: "10px" }}>
+                <p>名稱 : {productDetail.productName}</p>
+                <p>售價 : {productDetail.price}元</p>
+                <p>描述 : {productDetail.productDetail}</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    return (
-        <div>
-            {
-                productDetail &&
-                <div className="ProductDetail">
-
-                    <table width="100%">
-                        <tbody>
-                        <tr>
-                            <td align="right">
-                                <img src={process.env.PUBLIC_URL+'/assets/'+productDetail.image} alt={productDetail.name} width="400" />
-                            </td>
-                            <td width="45%" padding="10">
-                                <p>名稱 : {productDetail.name}</p>
-                                <p>售價 : {productDetail.price}元</p>
-                                <p>描述 : {productDetail.description}</p><br/>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            }
-        
-            <Link to="/" >
-                <div className="backToGoodsListBtn">↩️ 返回商品列表</div>
-            </Link>
-        </div>
-    )
-}
+      <Link to="/">返回商品列表</Link>
+    </div>
+  );
+};

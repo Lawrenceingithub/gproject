@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { Navbar } from "./components/navbar";
 import { Shop } from "./pages/shop/shop";
 import { Cart } from "./pages/cart/cart";
@@ -10,19 +10,21 @@ import { OrderHistory } from "./pages/user/orderhistory";
 import { ShopContextProvider } from "./context/shop-context";
 import { AuthContextProvider } from "./context/auth-context";
 import { User } from "./pages/user/user";
-import ProductDetail from "./pages/shop/productdetail";
+import { ProductDetail } from "./pages/shop/productdetail";
 
 function App() {
   return (
+    <BrowserRouter>
     <div className="App">
       <AuthContextProvider>
         <ShopContextProvider>
-          <Router>
             <Navbar />
             <Routes>
-              <Route path="/" element={<Shop />}>
-                <Route path="/product/:id" element={<ProductDetail />}/>
+              <Route path="/" element={<Shop />}/>
+              <Route path="/product" element={<ProductDetail/>}>
+              <Route path=":id" element= {<ProductDetail/>} />
               </Route>
+
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/user" element={<User />} />
@@ -31,10 +33,10 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/createaccount" element={<Createaccount />} />
             </Routes>
-          </Router>
         </ShopContextProvider>
       </AuthContextProvider>
     </div>
+    </BrowserRouter>
   );
 }
 
