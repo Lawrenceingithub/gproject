@@ -7,26 +7,24 @@ const bcrypt = require('bcrypt');
 app.use(cors());
 app.use(express.json());
 
-let db;  // Declare a variable to store the database connection
-
+let db;
 const connectToDatabase = async () => {
   try {
     db = await mysql.createConnection({
       user: "root",
       host: "localhost",
       password: "QWEasd123",
-      database: "employeesystem",
+      database: "shopdb",
     });
-    console.log("Database connection successful");
+    console.log("數據庫連接成功");
   } catch (error) {
-    console.error("Error connecting to the database:", error);
+    console.error("連接出錯:", error);
   }
 };
-
-connectToDatabase();  // Connect to the database when the server starts
+connectToDatabase();
 
 app.post("/login", async (req, res) => {
-  console.log("Received login request:", req.body);
+  console.log("連接請求:", req.body);
   const { username, password } = req.body;
 
   try {
@@ -37,6 +35,7 @@ app.post("/login", async (req, res) => {
 
       if (passwordMatch) {
         res.status(200).send("登入成功");
+        /* res.status(200).json({ user, username }); // 将用户信息包含在响应中  */
       } else {
         res.status(401).send("帳號或密碼錯誤");
       }
@@ -48,8 +47,6 @@ app.post("/login", async (req, res) => {
     res.status(500).send("伺服器出錯");
   }
 });
-
-
 
 app.post("/createaccount", async (req, res) => {
   const { username, password, nickname, phone, address } = req.body;
@@ -71,6 +68,7 @@ app.post("/createaccount", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("未能成功注冊");
+    return;
   }
 });
 

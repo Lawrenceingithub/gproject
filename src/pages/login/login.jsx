@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import "./login.css";
 import { UserCircle, IdentificationCard, Password } from "phosphor-react";
 import Axios from "axios";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/auth-context";
 
 export const Login = () => {
@@ -21,6 +21,8 @@ export const Login = () => {
       .then((response) => {
         console.log(response.data);
         if (response.status === 200 && response.data === "登入成功") {
+          const userData = response.data.user
+          authContext.updateUser(userData);
           setTimeout(() => {
             authContext.login(username);
             alert("歡迎 " + username);

@@ -11,6 +11,8 @@ export const Checkout = () => {
     <div className='checkoutcontent'>
       <h1>订单详情：</h1>
 
+      <p>訂單號碼: </p>
+
       {/* 用户信息 */}
       <p>用户名：{username}</p>
       <p>电话：{phone}</p>

@@ -14,16 +14,15 @@ import { ProductDetail } from "./pages/shop/productdetail";
 
 function App() {
   return (
-    <BrowserRouter>
-    <div className="App">
-      <AuthContextProvider>
-        <ShopContextProvider>
+    <BrowserRouter basename="/">
+      <div className="App">
+        <AuthContextProvider>
+          <ShopContextProvider>
             <Navbar />
             <Routes>
-              <Route path="/" element={<Shop />}/>
-              <Route path="/product" element={<ProductDetail/>}>
-              <Route path=":id" element= {<ProductDetail/>} />
-              </Route>
+              <Route path="/" element={<Shop />} />
+              <Route path="/product" element={<ProductDetail />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
 
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
@@ -33,9 +32,9 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/createaccount" element={<Createaccount />} />
             </Routes>
-        </ShopContextProvider>
-      </AuthContextProvider>
-    </div>
+          </ShopContextProvider>
+        </AuthContextProvider>
+      </div>
     </BrowserRouter>
   );
 }
