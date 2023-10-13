@@ -28,12 +28,12 @@ export const User = () => {
       <Sidebar />
       <div className="showuser">
         {userlist.map((user) => (
-          <div className="user" key={user.id}>
+          <table className="user" key={user.id}>
             <h3>Username: {user.username}</h3>
             <h3>Nickname: {user.nickname}</h3>
             <h3>Phone: {user.phone}</h3>
             <h3>Address: {user.address}</h3>
-          </div>
+          </table>
         ))}
       </div>
     </div>

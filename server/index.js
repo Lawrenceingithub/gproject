@@ -34,8 +34,8 @@ app.post("/login", async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (passwordMatch) {
-        res.status(200).send("登入成功");
-        /* res.status(200).json({ user, username }); // 将用户信息包含在响应中  */
+        /* res.status(200).send("登入成功"); */
+        res.status(200).json([user]);
       } else {
         res.status(401).send("帳號或密碼錯誤");
       }
@@ -77,7 +77,7 @@ app.get("/user", async (req, res) => {
   const { userId } = req.query;
 
   try {
-    const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE id = ?", [userId]);
+    const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE userId = ?", [userId || null]);
     res.send(rows);
   } catch (error) {
     console.log(error);

@@ -29,8 +29,8 @@ export const ProductDetail = () => {
 
   const handleCheckout = () => {
     if (isLoggedIn) {
-      checkout();
-      navigate("/checkout");
+      updateCartItemCount();
+      navigate("/cart");
     } else {
       navigate("/login");
     }
@@ -38,7 +38,7 @@ export const ProductDetail = () => {
   if (!productDetail) {
     return <div>產品不存在</div>;
   }
-
+        
   return (
     <div className="ProductDetailInfo">
       <div className="ProductDetail">
@@ -81,6 +81,7 @@ export const ProductDetail = () => {
                 <div>
                   <button onClick={() => navigate("/")}> 繼續購物 </button>
                   <button onClick={handleCheckout}> 結算 </button>
+
                 </div>
               </td>
             </tr>

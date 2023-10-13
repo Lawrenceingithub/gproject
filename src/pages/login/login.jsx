@@ -14,33 +14,33 @@ export const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    await Axios.post("http://localhost:3001/login", {
-      username: username,
-      password: password,
-    })
-      .then((response) => {
-        console.log(response.data);
-        if (response.status === 200 && response.data === "登入成功") {
-          const userData = response.data.user
-          authContext.updateUser(userData);
-          setTimeout(() => {
-            authContext.login(username);
-            alert("歡迎 " + username);
-            navigate('/');
-          }, 1000);
-        } else if (response.status === 401) {
-          setErrorMessage(response.data);
-        } else if (response.status === 404) {
-          setErrorMessage(response.data);
-        } else {
-          setErrorMessage(response.data);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        console.log(error.response);
-        setErrorMessage(error.response.data);
+    try {
+      const response = await Axios.post("http://localhost:3001/login", {
+        username: username,
+        password: password,
       });
+  
+      if (response.status === 200 && response.data.length > 0) {
+        const userData = response.data[0]; // 用户数据数组的第一个元素
+        console.log(userData);
+
+        setTimeout(() => {
+          authContext.login(username);
+          alert("歡迎 " + username);
+          navigate('/');
+        }, 1000);
+      } else if (response.status === 401) {
+        setErrorMessage(response.data);
+      } else if (response.status === 404) {
+        setErrorMessage(response.data);
+      } else {
+        setErrorMessage(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+      console.log(error.response);
+      setErrorMessage(error.response.data);
+    }
   };
   
   return (
