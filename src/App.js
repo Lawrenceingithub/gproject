@@ -27,8 +27,8 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/user" element={<User />} />
-              <Route path="/user/faq" element={<FAQ />} />
-              <Route path="/user/orderhistory" element={<OrderHistory />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/orderhistory" element={<OrderHistory />} />
               <Route path="/login" element={<Login />} />
               <Route path="/createaccount" element={<Createaccount />} />
             </Routes>

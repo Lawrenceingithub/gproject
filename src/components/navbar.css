@@ -12,13 +12,13 @@
    opacity: 0.8; /* 设置透明度为 0.8 */
 }
 
-.links {
+.navbarLink {
   margin-right: 50px;
   display: flex;
   align-items: center;
 }
 
-.links a {
+.navbarLink a {
   text-decoration: none;
   color: white;
   margin-left: 20px;
@@ -26,7 +26,7 @@
   font-size: 25px;
 }
 
-.navbar .links button {
+.navbar .navbarLink button {
   background-color: rgb(51, 0, 255);
   color: white;
   padding: 5px 10px;
@@ -37,7 +37,7 @@
   margin-left: auto;
 }
 
-.navbar .links h2 {
+.navbar .navbarLink h2 {
   /* 其他样式 */
   margin-right: 15px;
 }

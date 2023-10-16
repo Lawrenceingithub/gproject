@@ -1,17 +1,39 @@
 .userpage {
-  display: flexbox;
-  margin-top: 100px;
+  position: absolute;
 }
 
 .showuser {
   position: fixed;
-  flex-grow: 1;
-  margin-top: 100px;
+  top: 100px;
+  left: 180px;
   /* 其他样式属性 */
 }
 
-.showuser h1 { /* 修正选择器为 h1，而不是 .h1 */
-  margin-top: 100px;
-  font-size: 15px;
+.maincontent {
+  margin-top: 90px;
+  margin-left: 160px;
+  position:fixed;
+  border-radius: 5px;
+  padding: 700px;
+  border: 2px solid rgb(0, 0, 0); /* 调整为适当的边框宽度 */
+}
+
+.user {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px; /* 调整为适当的内边距 */
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   /* 其他样式属性 */
+}
+
+.user h3 {
+  margin: 0;
+}
+
+.user button {
+  margin-top: 10px;
+  /* 添加其他按钮样式，如背景色、文字颜色等 */
 }

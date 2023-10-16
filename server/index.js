@@ -74,10 +74,10 @@ app.post("/createaccount", async (req, res) => {
 
 
 app.get("/user", async (req, res) => {
-  const { userId } = req.query;
+  const { username } = req.query;
 
   try {
-    const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE userId = ?", [userId || null]);
+    const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username || null]);
     res.send(rows);
   } catch (error) {
     console.log(error);

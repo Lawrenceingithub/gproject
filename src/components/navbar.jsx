@@ -11,7 +11,7 @@ export const Navbar = () => {
 
   return (
     <div className="navbar">
-      <div className="links">
+      <div className="navbarLink">
         <Link to="/">測試頁</Link>
         {isLoggedIn ? (
           <>
