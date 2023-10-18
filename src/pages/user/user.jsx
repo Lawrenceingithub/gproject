@@ -1,40 +1,56 @@
-import React, { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../../context/auth-context";
+import { useState, useEffect, useContext } from "react";
 import Axios from "axios";
-import { Sidebar } from "../../components/sidebar";
-import { OrderHistory } from "./orderhistory";
-import { FAQ } from "./faq"; 
+import { AuthContext } from "../../context/auth-context";
 import "./user.css";
 
 export const User = () => {
-  const { username } = useContext(AuthContext);
+  const { username, nickname, phone, address } = useContext(AuthContext);
+  const [contentId, setContentId] = useState("orderhistory");
+  const [editingUserId, setEditingUserId] = useState(null);
   const [userlist, setUserlist] = useState([]);
-  const [contentId, setContentId] = useState("showuser"); // 设置初始值为 "showuser"
 
   useEffect(() => {
-    showUser(username);
-  }, []);
+    const fetchData = async () => {
+      try {
+        const response = await Axios.get("http://localhost:3001/user", {
+          params: { username: username },
+        });
+        setUserlist(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, [username]);
 
-  const showUser = async () => {
+  const handleEdit = (userId) => {
+    setEditingUserId(userId);
+  };
+
+  const handleSave = async (userId) => {
     try {
-      const response = await Axios.get("http://localhost:3001/user", {
-        params: { username: username },
-      });
-
-      setUserlist(response.data);
+      const response = await Axios.post(
+        `http://localhost:3001/user`, // 根据您的API端点进行修改
+        {
+          nickname: nickname,
+          phone: phone,
+          address: address,
+        }
+      );
+      console.log(response.data);
+      setEditingUserId(null); // 保存成功后重置编辑状态
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleEdit = () =>{
-
+  const handleCancelEdit = () => {
+    setEditingUserId(null); // 重置编辑状态
   };
 
-  const handleDelete = () =>{
-
+  const handleDelete = (id) => {
+    // 处理删除逻辑
   };
-
 
   const handleSidebarClick = (id) => {
     setContentId(id);
@@ -42,38 +58,64 @@ export const User = () => {
 
   const renderContent = () => {
     if (contentId === "showuser") {
-      // 显示原始的 showuser 内容
       return (
         <div className="showuser">
           {userlist.map((user) => (
             <div className="user" key={user.id}>
-              <h3>Username: {user.username}</h3>
-              <h3>Nickname: {user.nickname}</h3>
-              <h3>Phone: {user.phone}</h3>
-              <h3>Address: {user.address}</h3>
-              <div className="user-buttons">
-                <button onClick={() => handleEdit(user.id)}>修改</button>
-                <button onClick={() => handleDelete(user.id)}>刪除帳號</button>
-              </div>
+              {editingUserId === user.id ? (
+                <>
+                  <h3>
+                    Username: {user.username}
+                  </h3> 
+                  <h3>
+                    Nickname: <input defaultValue={user.nickname} />
+                  </h3>
+                  <h3>
+                    Phone: <input defaultValue={user.phone} />
+                  </h3>
+                  <h3>
+                    Address: <input defaultValue={user.address} />
+                  </h3>
+                  <div className="user-buttons">
+                    <button onClick={() => handleSave(user.id)}>保存</button>
+                    <button onClick={() => handleCancelEdit()}>取消</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3>Username: {user.username}</h3>
+                  <h3>Nickname: {user.nickname}</h3>
+                  <h3>Phone: {user.phone}</h3>
+                  <h3>Address: {user.address}</h3>
+                  <div className="user-buttons">
+                    <button onClick={() => handleEdit(user.id)}>修改</button>
+                    <button onClick={() => handleDelete(user.id)}>
+                      刪除帳號
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>
       );
-    } else if (contentId === "orderhistory") {
-      // 显示订单历史组件
-      return <OrderHistory />;
     }
-    // 添加其他内容标识符的处理逻辑
   };
 
   return (
     <div className="userpage">
       <div className="sidebar">
-        <Sidebar onSidebarClick={handleSidebarClick} />
+        <button onClick={() => handleSidebarClick("showuser")}>
+          <h1>用戶資料</h1>
+        </button>
+        <button onClick={() => handleSidebarClick("orderhistory")}>
+          <h1>訂單記錄</h1>
+        </button>
+        <button onClick={() => handleSidebarClick("faq")}>
+          <h1>常見問題</h1>
+        </button>
       </div>
-      <div className="maincontent">
-        {renderContent()}
-      </div>
+      <div className="maincontent">{renderContent()}</div>
     </div>
   );
 };
