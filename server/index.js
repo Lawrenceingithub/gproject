@@ -85,6 +85,22 @@ app.get("/user", async (req, res) => {
   }
 });
 
+app.post("/user", async (req, res) => {
+  const { username, nickname, phone, address } = req.body;
+
+  try {
+    await db.execute(
+      "UPDATE userdb SET nickname = ?, phone = ?, address = ? WHERE userId = ?",
+      [nickname || null, phone || null, address || null]
+    );
+    res.send("更新成功");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("出錯");
+  }
+});
+
+
 
 app.listen(3001, () => {
   console.log("Server is running");

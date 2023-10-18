@@ -1,39 +1,50 @@
-.userpage {
-  position: absolute;
+.sidebar {
+  position: fixed;
+  width: 155px;
+  height: 100%;
+  background-color: black;
+  font-family: Arial, Helvetica, sans-serif;
+  opacity: 0.8;
 }
 
-.showuser {
-  position: fixed;
-  top: 100px;
-  left: 180px;
-  /* 其他样式属性 */
+.sidebar button {
+  font-size: 12px;
+  margin: 21px;
+  display: block; /* 将链接作为块级元素显示 */
 }
 
 .maincontent {
-  margin-top: 90px;
+  position: relative;
+  flex: 100%;
   margin-left: 160px;
-  position:fixed;
+  margin-top: 90px;
   border-radius: 5px;
-  padding: 700px;
   border: 2px solid rgb(0, 0, 0); /* 调整为适当的边框宽度 */
 }
 
 .user {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px; /* 调整为适当的内边距 */
+  padding: 10px; /* 调整为适当的内边距 */ 
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   /* 其他样式属性 */
 }
 
 .user h3 {
-  margin: 0;
+  margin: 25px;
 }
 
-.user button {
-  margin-top: 10px;
-  /* 添加其他按钮样式，如背景色、文字颜色等 */
+.user-buttons {
+  margin-top: auto; /* 将按钮推到用户信息的中下方 */
+}
+
+.user-buttons button {
+  background-color: rgb(45, 197, 83);
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  margin: 10px;
 }

@@ -36,11 +36,13 @@ export const Cart = () => {
           }
           return null;
         })}
+        <h1>配送方式</h1>
+        <slelectoption id="selfpickup"value="自取"/>
       </div>
 
       {totalAmount > 0 ? (
         <div className="checkout">
-          <p> 總計: ${totalAmount} </p>
+          <b><p> 總計: ${totalAmount} </p></b>
           <button onClick={() => navigate("/")}> 繼續購物 </button>
           <button onClick={handleCheckout}> 結算 </button>
         </div>

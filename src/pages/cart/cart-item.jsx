@@ -12,8 +12,8 @@ export const CartItem = (props) => {
       <div className="description">
         <>
         <p>
-          <b>名稱: {productName}</b>
-          <h4>詳情: {productDetail}</h4>
+          <b>名稱: {productName}</b><br/>
+          <b>詳情: {productDetail}</b>
         </p>
         </>
         <p> 價值: ${price}</p>
