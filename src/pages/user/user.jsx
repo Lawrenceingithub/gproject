@@ -4,7 +4,6 @@ import { AuthContext } from "../../context/auth-context";
 import "./user.css";
 
 export const User = () => {
-  const { isAdmin, isUser } = useContext(AuthContext);
   const { username, nickname, phone, address } = useContext(AuthContext);
   const [contentId, setContentId] = useState("showuser");
   const [editingUserId, setEditingUserId] = useState(null);
@@ -14,7 +13,7 @@ export const User = () => {
     const fetchData = async () => {
       try {
         const response = await Axios.get("http://localhost:3001/user", {
-          params: { username: username }, // 用 userId 代替 username
+          params: { username: username },
         });
         setUserlist(response.data);
       } catch (error) {
@@ -28,26 +27,27 @@ export const User = () => {
     setEditingUserId(userId);
   };
 
-  const handleSave = async (username) => { // 使用 username 作为参数
+  const handleSave = async (userId) => {
     try {
       const response = await Axios.put(
-        `http://localhost:3001/user`, // 根据你的API端点进行修改
+        `http://localhost:3001/user`,
         {
-          username: username, // 使用 username 作为标识符
+          username: username, // 确保 username 有值
+          userId: userId, // 确保 userId 有值
           nickname: nickname,
           phone: phone,
           address: address,
         }
       );
       console.log(response.data);
-      setEditingUserId(null); // 保存成功后重置编辑状态
+      setEditingUserId(null);
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleCancelEdit = () => {
-    setEditingUserId(null); // 重置编辑状态
+    setEditingUserId(null);
   };
 
   const handleDelete = (id) => {
@@ -67,43 +67,28 @@ export const User = () => {
               <h3>Username: {user.username}</h3>
               {editingUserId === user.id ? (
                 <>
-                  {isAdmin && (
-                    <>
-                      <h3>
-                        Nickname: <input defaultValue={user.nickname} />
-                      </h3>
-                      <h3>
-                        Phone: <input defaultValue={user.phone} />
-                      </h3>
-                      <h3>
-                        Address: <input defaultValue={user.address} />
-                      </h3>
-                      <div className="user-buttons">
-                        <button onClick={() => handleSave(user.id)}>保存</button>
-                        <button onClick={() => handleCancelEdit()}>取消</button>
-                      </div>
-                    </>
-                  )}
+                  <h3>
+                    Nickname: <input defaultValue={user.nickname} />
+                  </h3>
+                  <h3>
+                    Phone: <input defaultValue={user.phone} />
+                  </h3>
+                  <h3>
+                    Address: <input defaultValue={user.address} />
+                  </h3>
+                  <div className="user-buttons">
+                    <button onClick={() => handleSave(user.id)}>保存</button>
+                    <button onClick={() => handleCancelEdit()}>取消</button>
+                  </div>
                 </>
               ) : (
                 <>
-                  {isUser && !isAdmin && (
-                    <>
-                      <h3>Nickname: {user.nickname}</h3>
-                      <h3>Phone: {user.phone}</h3>
-                      <h3>Address: {user.address}</h3>
-                      <div className="user-buttons">
-                        {isUser && (
-                          <button onClick={() => handleEdit(user.id)}>修改</button>
-                        )}
-                      </div>
-                    </>
-                  )}
-                  {isAdmin && (
-                    <div className="user-buttons">
-                      <button onClick={() => handleDelete(user.id)}>刪除帳號</button>
-                    </div>
-                  )}
+                  <h3>Nickname: {user.nickname}</h3>
+                  <h3>Phone: {user.phone}</h3>
+                  <h3>Address: {user.address}</h3>
+                  <div className="user-buttons">
+                    <button onClick={() => handleEdit(user.id)}>修改</button>
+                  </div>
                 </>
               )}
             </div>
