@@ -1,34 +1,77 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 
 export const AuthContext = createContext({
   isLoggedIn: false,
+  userId:"",
   username: "",
   login: () => {},
   logout: () => {},
 });
 
 export const AuthContextProvider = ({ children }) => {
+  const [userRole, setUserRole] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
-  const [user, setUser] = useState(null); // 添加 user 状态
+  const [userId, setUserId] = useState(""); // 添加 userId 变量
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isUser, setIsUser] = useState(false);
 
-  const login = (username) => {
+  useEffect(() => {
+    // 在应用启动时检查本地存储中是否有登录状态
+    const storedLoggedIn = localStorage.getItem("isLoggedIn");
+    if (storedLoggedIn === "true") {
+      const storedUsername = localStorage.getItem("username");
+      setIsLoggedIn(true);
+      setUsername(storedUsername);
+    }
+  }, []);
+
+  useEffect(() => {
+    // 获取用户的角色信息，可以从服务器端或本地存储中获取
+    const storedUserRole = localStorage.getItem("userRole");
+    if (storedUserRole) {
+      setUserRole(storedUserRole);
+    }
+  }, []);
+
+  const login = (username, role) => {
     setIsLoggedIn(true);
     setUsername(username);
+
+    // 将登录状态存储在本地存储中
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("username", username);
+
+    if (role === "1") {
+      setIsAdmin(true);
+    } else if (role === "0") {
+      setIsUser(true);
+    }
   };
 
   const logout = () => {
     setIsLoggedIn(false);
-    setUser(null); // 在登出时清除用户信息
+    setUsername("");
+    setIsAdmin(false);
+    setIsUser(false);
+
+    // 清除本地存储中的登录状态
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("username");
   };
 
   const updateUser = (userData) => {
-    setUser(userData); // 更新用户信息
+    setUserRole(userData.role); // 更新用户角色
+
+    // 将用户角色存储在本地存储中
+    localStorage.setItem("userRole", userData.role);
   };
 
   const authContextValue = {
     isLoggedIn,
     username,
+    userRole,
+    userId, // 确保定义了 userId
     login,
     logout,
     updateUser,

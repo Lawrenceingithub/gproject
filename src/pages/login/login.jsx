@@ -9,6 +9,12 @@ export const Login = () => {
   const [username, setusername] = useState("");
   const [password, setpassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [userData, setUserData] = useState({
+    username: "",
+    nickname: "",
+    phone: "",
+    address: ""
+  });
 
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
@@ -20,28 +26,34 @@ export const Login = () => {
         password: password,
       });
   
-      if (response.status === 200 && response.data.length > 0) {
-        const userData = response.data[0]; // 用户数据数组的第一个元素
-        console.log(userData);
-
+      if (response.status === 200 && response.data) {
+        const { username, nickname, phone, address } = response.data;
+        setUserData({
+          username,
+          nickname,
+          phone,
+          address
+        });
+      
         setTimeout(() => {
           authContext.login(username);
           alert("歡迎 " + username);
           navigate('/');
         }, 1000);
       } else if (response.status === 401) {
-        setErrorMessage(response.data);
+        setErrorMessage(response.data.error);
       } else if (response.status === 404) {
-        setErrorMessage(response.data);
+        setErrorMessage(response.data.error);
       } else {
-        setErrorMessage(response.data);
+        setErrorMessage("未知错误");
       }
     } catch (error) {
       console.log(error);
       console.log(error.response);
-      setErrorMessage(error.response.data);
+      setErrorMessage("未知错误");
     }
   };
+  
   
   return (
     <>

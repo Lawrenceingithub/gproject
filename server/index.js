@@ -34,19 +34,22 @@ app.post("/login", async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (passwordMatch) {
-        /* res.status(200).send("登入成功"); */
-        res.status(200).json([user]);
+        // 登录成功，返回用户信息
+        res.status(200).json(user);
       } else {
-        res.status(401).send("帳號或密碼錯誤");
+        // 密码错误
+        res.status(401).json({ error: "帳號或密碼錯誤" });
       }
     } else {
-      res.status(404).send("帳號不存在");
+      // 用户不存在
+      res.status(404).json({ error: "帳號不存在" });
     }
   } catch (error) {
     console.error("Server error:", error);
-    res.status(500).send("伺服器出錯");
+    res.status(500).json({ error: "伺服器出錯" });
   }
 });
+
 
 app.post("/createaccount", async (req, res) => {
   const { username, password, nickname, phone, address } = req.body;
@@ -60,7 +63,7 @@ app.post("/createaccount", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.execute(
-      "INSERT INTO userdb (username, password, nickname, phone, address, createdate) VALUES (?, ?, ?, ?, ?, NOW())",
+      "INSERT INTO userdb (username, password, nickname, phone, address, createdate, userrole) VALUES (?, ?, ?, ?, ?, NOW(),'0')",
       [username, hashedPassword, nickname, phone, address]
     );
 
@@ -74,7 +77,7 @@ app.post("/createaccount", async (req, res) => {
 
 
 app.get("/user", async (req, res) => {
-  const { username } = req.query;
+  const { username } = req.query; // 使用 userId 查询用户
 
   try {
     const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username || null]);
@@ -85,22 +88,20 @@ app.get("/user", async (req, res) => {
   }
 });
 
-app.post("/user", async (req, res) => {
-  const { username, nickname, phone, address } = req.body;
+app.put("/user", async (req, res) => {
+  const { userId, nickname, phone, address } = req.body;
 
   try {
     await db.execute(
       "UPDATE userdb SET nickname = ?, phone = ?, address = ? WHERE userId = ?",
-      [nickname || null, phone || null, address || null]
+      [nickname, phone, address, userId]
     );
     res.send("更新成功");
   } catch (error) {
     console.log(error);
-    res.status(500).send("出錯");
+    res.status(500).send("出错");
   }
 });
-
-
 
 app.listen(3001, () => {
   console.log("Server is running");

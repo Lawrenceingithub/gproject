@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ShopContext } from '../../context/shop-context';
-import { AuthContext} from '../../context/auth-context';
+import { AuthContext } from '../../context/auth-context';
 import './checkout.css';
 
 export const Checkout = () => {
@@ -14,9 +14,9 @@ export const Checkout = () => {
       <p>訂單號碼: </p>
 
       {/* 用户信息 */}
-      <p>用户名：{username}</p>
-      <p>电话：{phone}</p>
-      <p>地址：{address}</p>
+      {typeof username === 'string' && <p>用户名：{username}</p>}
+      {typeof phone === 'string' && <p>电话：{phone}</p>}
+      {typeof address === 'string' && <p>地址：{address}</p>}
 
       {/* 总金额 */}
       <p>Total: ${getTotalCartAmount()}</p>
@@ -33,7 +33,6 @@ export const Checkout = () => {
           </div>
         );
       })}
-      
     </div>
   );
 };
