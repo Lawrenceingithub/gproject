@@ -4,41 +4,54 @@ import { AuthContext } from "../../context/auth-context";
 import "./user.css";
 
 export const User = () => {
-  const { username, nickname, phone, address } = useContext(AuthContext);
+  const { userID, nickname, phone, address } = useContext(AuthContext);
   const [contentId, setContentId] = useState("showuser");
   const [editingUserId, setEditingUserId] = useState(null);
   const [userlist, setUserlist] = useState([]);
+  const [editedNickname, setEditedNickname] = useState("");
+  const [editedPhone, setEditedPhone] = useState("");
+  const [editedAddress, setEditedAddress] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await Axios.get("http://localhost:3001/user", {
-          params: { username: username },
+          params: { userID: userID },
         });
-        setUserlist(response.data);
+        console.log(response.data);
+        setUserlist([response.data]);
       } catch (error) {
         console.log(error);
       }
     };
     fetchData();
-  }, [username]);
+  }, [userID]);
 
-  const handleEdit = (userId) => {
-    setEditingUserId(userId);
+  const handleEdit = (userID) => {
+    setEditingUserId(userID);
+    const currentUser = userlist.find((user) => user.userID === userID);
+    setEditedNickname(currentUser.nickname);
+    setEditedPhone(currentUser.phone);
+    setEditedAddress(currentUser.address);
   };
 
-  const handleSave = async (userId) => {
+  const handleSave = async (userID) => {
+    if (
+      editedNickname === undefined ||
+      editedPhone === undefined ||
+      editedAddress === undefined
+    ) {
+      console.error("Invalid user data");
+      return;
+    }
+
     try {
-      const response = await Axios.put(
-        `http://localhost:3001/user`,
-        {
-          username: username, // 确保 username 有值
-          userId: userId, // 确保 userId 有值
-          nickname: nickname,
-          phone: phone,
-          address: address,
-        }
-      );
+      const response = await Axios.put(`http://localhost:3001/user`, {
+        userID: userID,
+        nickname: editedNickname || "", // 给 nickname 设置默认值
+        phone: editedPhone || "", // 给 phone 设置默认值
+        address: editedAddress || "", // 给 address 设置默认值
+      });
       console.log(response.data);
       setEditingUserId(null);
     } catch (error) {
@@ -63,31 +76,48 @@ export const User = () => {
       return (
         <div className="showuser">
           {userlist.map((user) => (
-            <div className="user" key={user.id}>
-              <h3>Username: {user.username}</h3>
-              {editingUserId === user.id ? (
+            <div className="user" key={user.userID}>
+              {editingUserId === user.userID ? (
                 <>
+                  <h3>Username: {user.username}</h3>
                   <h3>
-                    Nickname: <input defaultValue={user.nickname} />
+                    Nickname:{" "}
+                    <input
+                      value={editedNickname}
+                      onChange={(e) => setEditedNickname(e.target.value)}
+                    />
                   </h3>
                   <h3>
-                    Phone: <input defaultValue={user.phone} />
+                    Phone:{" "}
+                    <input
+                      value={editedPhone}
+                      onChange={(e) => setEditedPhone(e.target.value)}
+                    />
                   </h3>
                   <h3>
-                    Address: <input defaultValue={user.address} />
+                    Address:{" "}
+                    <input
+                      value={editedAddress}
+                      onChange={(e) => setEditedAddress(e.target.value)}
+                    />
                   </h3>
                   <div className="user-buttons">
-                    <button onClick={() => handleSave(user.id)}>保存</button>
+                    <button onClick={() => handleSave(user.userID)}>
+                      保存
+                    </button>
                     <button onClick={() => handleCancelEdit()}>取消</button>
                   </div>
                 </>
               ) : (
                 <>
+                  <h3>Username: {user.username}</h3>
                   <h3>Nickname: {user.nickname}</h3>
                   <h3>Phone: {user.phone}</h3>
                   <h3>Address: {user.address}</h3>
                   <div className="user-buttons">
-                    <button onClick={() => handleEdit(user.id)}>修改</button>
+                    <button onClick={() => handleEdit(user.userID)}>
+                      修改
+                    </button>
                   </div>
                 </>
               )}
@@ -95,6 +125,8 @@ export const User = () => {
           ))}
         </div>
       );
+    } else {
+      return <div>No user data available</div>;
     }
   };
 

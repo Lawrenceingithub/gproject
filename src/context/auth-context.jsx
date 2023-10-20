@@ -2,17 +2,18 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 
 export const AuthContext = createContext({
   isLoggedIn: false,
-  userId:"",
+  userID:null,
   username: "",
   login: () => {},
   logout: () => {},
+  setUserID: () => {}, // 添加 setUserID 方法
 });
 
 export const AuthContextProvider = ({ children }) => {
   const [userRole, setUserRole] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
-  const [userId, setUserId] = useState(""); // 添加 userId 变量
+  const [userID, setUserID] = useState(""); // 添加 userId 变量
   const [isAdmin, setIsAdmin] = useState(false);
   const [isUser, setIsUser] = useState(false);
 
@@ -34,9 +35,10 @@ export const AuthContextProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (username, role) => {
+  const login = (username, role, userID) => {
     setIsLoggedIn(true);
     setUsername(username);
+    setUserID(userID); // 设置 userID 的值
 
     // 将登录状态存储在本地存储中
     localStorage.setItem("isLoggedIn", "true");
@@ -71,7 +73,7 @@ export const AuthContextProvider = ({ children }) => {
     isLoggedIn,
     username,
     userRole,
-    userId, // 确保定义了 userId
+    userID, // 确保定义了 userId
     login,
     logout,
     updateUser,

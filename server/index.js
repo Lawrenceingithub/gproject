@@ -24,8 +24,8 @@ const connectToDatabase = async () => {
 connectToDatabase();
 
 app.post("/login", async (req, res) => {
-  console.log("連接請求:", req.body);
   const { username, password } = req.body;
+  console.log("連接請求:", req.body);
 
   try {
     const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username]);
@@ -34,8 +34,14 @@ app.post("/login", async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (passwordMatch) {
-        // 登录成功，返回用户信息
-        res.status(200).json(user);
+        // 登录成功，返回用户信息，包括 userId
+        res.status(200).json({
+          userID: user.userID,
+          username: user.username,
+          nickname: user.nickname,
+          phone: user.phone,
+          address: user.address
+        });
       } else {
         // 密码错误
         res.status(401).json({ error: "帳號或密碼錯誤" });
@@ -77,29 +83,30 @@ app.post("/createaccount", async (req, res) => {
 
 
 app.get("/user", async (req, res) => {
-  const { username } = req.query; // 使用 userId 查询用户
+  const { userID } = req.query;
 
   try {
-    const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username || null]);
+    const query = `SELECT username, nickname, phone, address FROM userdb WHERE userID = ?`;
+    const [rows, fields] = await db.execute(query, [userID || null]);
     res.send(rows);
   } catch (error) {
     console.log(error);
-    res.status(500).send("出錯");
+    res.status(500).send("查询用户数据时发生错误");
   }
 });
 
 app.put("/user", async (req, res) => {
-  const { userId, nickname, phone, address } = req.body;
+  const {nickname, phone, address } = req.body;
 
   try {
     await db.execute(
-      "UPDATE userdb SET nickname = ?, phone = ?, address = ? WHERE userId = ?",
-      [nickname, phone, address, userId]
+      "UPDATE userdb SET nickname = ?, phone = ?, address = ? WHERE userID = ?",
+      [nickname, phone, address]
     );
     res.send("更新成功");
   } catch (error) {
-    console.log(error);
-    res.status(500).send("出错");
+    console.log("Error:", error);
+    res.status(500).send("出错：" + error.message);  // 发送包含错误消息的响应
   }
 });
 

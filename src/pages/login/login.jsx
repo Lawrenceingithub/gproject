@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "./login.css";
 import { UserCircle, IdentificationCard, Password } from "phosphor-react";
 import Axios from "axios";
@@ -6,15 +6,23 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/auth-context";
 
 export const Login = () => {
+  const [userID, setUserID] = useState(null);
   const [username, setusername] = useState("");
   const [password, setpassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [userData, setUserData] = useState({
+    userID:"",
     username: "",
     nickname: "",
     phone: "",
-    address: ""
+    address: "",
+    userrole:""
   });
+
+  useEffect(() => {
+    // 这个 useEffect 会在 userId 变化后执行
+    console.log(userID);
+  }, [userID]);
 
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
@@ -27,16 +35,19 @@ export const Login = () => {
       });
   
       if (response.status === 200 && response.data) {
-        const { username, nickname, phone, address } = response.data;
+        const { userID, username, nickname, phone, address, userrole } = response.data;
         setUserData({
+          userID,
           username,
           nickname,
           phone,
           address
         });
-      
+
+        // 在这里设置 userId 的值
+        setUserID(userID);
         setTimeout(() => {
-          authContext.login(username);
+          authContext.login(username, userID); // 设置 userId
           alert("歡迎 " + username);
           navigate('/');
         }, 1000);
