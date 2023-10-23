@@ -1,5 +1,5 @@
-import React, { useState, useContext  } from "react";
-import { useNavigate  } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { Phone, AddressBook, Password, IdentificationCard } from "phosphor-react";
 import { AuthContext } from "../../context/auth-context";
 import "./createaccount.css";
@@ -11,14 +11,14 @@ export const Createaccount = () => {
   const [nickname, setNickname] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [message, setMessage] = useState({ text: null, type: "" });
+  const [errorMessage, setErrorMessage] = useState(""); // Updated for error handling
 
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const submit = async () => {
-    if (username && password) {
-      try {
+  const handleRegistration = async () => {
+    try {
+      if (username && password) {
         const response = await Axios.post("http://localhost:3001/createaccount", {
           username: username,
           password: password,
@@ -26,20 +26,22 @@ export const Createaccount = () => {
           phone: phone,
           address: address,
         });
-        console.log(response);
-        setMessage({ text: "註冊成功", type: "success" });
-        setTimeout(() => {
-          authContext.login(username);  // 更新 context 中的用户名
+  
+        if (response.status === 200) {
+          // 注册成功
+          const { userID, username, userrole } = response.data;
+          authContext.login(username, userrole, userID);
           navigate('/');
-        }, 1000);
-      } catch (error) {
-        setMessage({ text: "發生錯誤", type: "error" });
+        }
+      } else {
+        setErrorMessage("用户名和密码不能为空");
       }
-    } else {
-      setMessage({ text: "用戶名和密碼不能為空", type: "error" });
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.error) {
+        setErrorMessage(error.response.data.error);
+      }
     }
   };
-  
 
   return (
     <div className="createaccount">
@@ -47,7 +49,7 @@ export const Createaccount = () => {
         <div className="formtitle">
           <h1>注册表</h1>
         </div>
-        
+
         <IdentificationCard />
         <label>用户名:</label>
         <input
@@ -93,9 +95,9 @@ export const Createaccount = () => {
           required
         />
 
-        <button onClick={submit}>注册</button>
+        <button onClick={handleRegistration}>注册</button>
 
-        {message.text !== null && <div className={`message ${message.type}`}>{message.text}</div>}
+        {errorMessage && <div className="message error">{errorMessage}</div>}
       </div>
     </div>
   );

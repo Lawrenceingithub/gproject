@@ -6,25 +6,29 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/auth-context";
 
 export const Login = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userID, setUserID] = useState(null);
   const [username, setusername] = useState("");
   const [password, setpassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [userData, setUserData] = useState({
-    userID:"",
+    userID: "",
     username: "",
     nickname: "",
     phone: "",
     address: "",
-    userrole:""
+    userrole: "",
   });
+
+  const authContext = useContext(AuthContext); // 移动 useContext 到这里
 
   useEffect(() => {
     // 这个 useEffect 会在 userId 变化后执行
-    console.log(userID);
-  }, [userID]);
+    console.log("userID from state:", userID);
+    console.log("userID from authContext:", authContext.userID);
+  }, [userID, authContext.userID]);
+  
 
-  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -34,38 +38,45 @@ export const Login = () => {
         password: password,
       });
   
-      if (response.status === 200 && response.data) {
+      if (response.status === 200) {
+        // 登录成功
         const { userID, username, nickname, phone, address, userrole } = response.data;
         setUserData({
           userID,
           username,
           nickname,
           phone,
-          address
+          address,
+          userrole,
         });
-
+  
         // 在这里设置 userId 的值
         setUserID(userID);
-        setTimeout(() => {
-          authContext.login(username, userID); // 设置 userId
-          alert("歡迎 " + username);
-          navigate('/');
-        }, 1000);
-      } else if (response.status === 401) {
-        setErrorMessage(response.data.error);
-      } else if (response.status === 404) {
-        setErrorMessage(response.data.error);
+        setusername(username);
+  
+        // 使用 setIsLoggedIn 设置用户登录状态为 true
+        setIsLoggedIn(true);
+        
+        authContext.login(userID, username, nickname, phone, address, userrole);
+  
+        // 设置用户已登录
+        localStorage.setItem("isLoggedIn", "true");
+        console.log(isLoggedIn);
+        alert("歡迎 " + username);
+        navigate("/");
+      }
+    } catch (error) {
+      console.log("登錄錯誤：", error);
+      if (error.response && error.response.data && error.response.data.error) {
+        setErrorMessage(error.response.data.error);
       } else {
         setErrorMessage("未知错误");
       }
-    } catch (error) {
-      console.log(error);
-      console.log(error.response);
-      setErrorMessage("未知错误");
     }
   };
   
   
+
   return (
     <>
       <div className="logininfo">
@@ -92,7 +103,6 @@ export const Login = () => {
           注册新帐号? <Link to="/createaccount">注册</Link>
         </p>
       </div>
-  
     </>
   );
 };
