@@ -5,18 +5,16 @@ export const AuthContext = createContext({
   userID: null,
   login: () => {},
   logout: () => {},
-  setUserID: () => {},
-  setNickname: () => {},
-  setPhone: () => {},
-  setAddress: () => {},
-  setuserRole: () => {},
-  setIsLoggedIn: ()=>{},
+  setUserID: (userID) => {},
+  setNickname: (nickname) => {},
+  setPhone: (phone) => {},
+  setAddress: (address) => {},
+  isLoggedIn: false,
   isAdmin: false,
   isUser: false,
 });
 
 export const AuthContextProvider = ({ children }) => {
-  // 使用对象存储所有本地存储键值对
   const localStorageKeys = {
     isLoggedIn: "isLoggedIn",
     username: "username",
@@ -24,74 +22,62 @@ export const AuthContextProvider = ({ children }) => {
     nickname: "nickname",
     phone: "phone",
     address: "address",
-    userrole: "userrole",
+    userrole: "userrole"
   };
-
-  const [userrole, setuserRole] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [isUser, setIsUser] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // 檢查本地存儲并設置用戶角色
-    const storedUserrole = localStorage.getItem(localStorageKeys.userrole);
-    if (storedUserrole) {
-      setuserRole(storedUserrole);
-      if (storedUserrole === "1") {
-        setIsAdmin(true);
-      } else if (storedUserrole === "0") {
-        setIsUser(true);
-      }
-    }
-    
-    // 检查本地存储并设置登录状态
     const storedIsLoggedIn = localStorage.getItem(localStorageKeys.isLoggedIn);
+  
     if (storedIsLoggedIn === "true") {
       setIsLoggedIn(true);
     }
+    
+    if (localStorage.getItem(localStorageKeys.userrole)==="1"){
+      setIsAdmin(true);
+    } else {
+      setIsUser(true);
+    }
+
   }, []);
-  
+
   const login = async (userID, username, nickname, phone, address, userrole) => {
-    // 设置用户信息
     const userInfo = {
       userID,
       username,
       nickname,
       phone,
       address,
-      userrole,
+      userrole
     };
-  
-    // 将用户信息存储在本地存儲中，包括 username
-    for (const key in localStorageKeys) {
+
+    for (const key of Object.keys(userInfo)) {
       localStorage.setItem(localStorageKeys[key], userInfo[key]);
     }
-  
+
+    localStorage.setItem(localStorageKeys.isLoggedIn, "true");
     setIsLoggedIn(true);
-  
-    // 设置用户角色
-    setuserRole(userrole);
+
     if (userrole === "1") {
       setIsAdmin(true);
+      localStorage.setItem(localStorageKeys.userrole, userrole);
     } else if (userrole === "0") {
       setIsUser(true);
+      localStorage.setItem(localStorageKeys.userrole, userrole);
     }
-  
-    // 設置 username
-    localStorage.setItem(localStorageKeys.username, username);
   };
 
   const logout = () => {
-    // 清除本地存儲中的用戶信息和角色
     for (const key in localStorageKeys) {
       localStorage.removeItem(localStorageKeys[key]);
     }
-    
-    // 清除 username
+
     localStorage.removeItem(localStorageKeys.username);
-    
-    // 重置用戶角色
-    setuserRole("");
+    localStorage.removeItem(localStorageKeys.isLoggedIn); // 更新本地存储中的 isLoggedIn 值
+    localStorage.removeItem(localStorageKeys.userrole);
+
     setIsAdmin(false);
     setIsUser(false);
     setIsLoggedIn(false);
@@ -103,26 +89,18 @@ export const AuthContextProvider = ({ children }) => {
     login,
     logout,
     setUserID: (userID) => {
-      // 设置 userID 并存储在本地存储中
       localStorage.setItem(localStorageKeys.userID, userID);
     },
     setNickname: (nickname) => {
-      // 设置 nickname 并存储在本地存储中
       localStorage.setItem(localStorageKeys.nickname, nickname);
     },
     setPhone: (phone) => {
-      // 设置 phone 并存储在本地存储中
       localStorage.setItem(localStorageKeys.phone, phone);
     },
     setAddress: (address) => {
-      // 设置 address 并存储在本地存储中
       localStorage.setItem(localStorageKeys.address, address);
     },
-    setuserRole: (userrole) => {
-      // 设置 address 并存储在本地存储中
-      localStorage.setItem(localStorageKeys.userrole, userrole);
-    },
-    setuserRole,
+    isLoggedIn,
     isAdmin,
     isUser,
   };
