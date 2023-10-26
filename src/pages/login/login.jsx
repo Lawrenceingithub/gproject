@@ -1,9 +1,9 @@
 import React, { useState, useContext } from "react";
 import "./login.css";
 import { UserCircle, IdentificationCard, Password } from "phosphor-react";
-import Axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/auth-context";
+import { users } from "../../userlist";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
@@ -13,30 +13,20 @@ export const Login = () => {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    try {
-      const response = await Axios.post("http://localhost:3001/login", {
-        username: username,
-        password: password,
-      });
+  const handleLogin = () => {
+    const user = users.find((user) => user.username === username && user.password === password);
 
-      if (response.status === 200) {
-        const { userID, username, nickname, phone, address, userrole } = response.data;
+    if (user) {
+      const { id, username, nickname, phone, address, userrole } = user;
 
-        authContext.login(userID, username, nickname, phone, address, userrole);
-        
-        setUsername(username);
-        alert("歡迎 " + username);
+      authContext.login(id, username, nickname, phone, address, userrole);
 
-        navigate("/");
-      }
-    } catch (error) {
-      console.log("登錄錯誤：", error);
-      if (error.response && error.response.data && error.response.data.error) {
-        setErrorMessage(error.response.data.error);
-      } else {
-        setErrorMessage("未知错误");
-      }
+      setUsername(username);
+      alert("歡迎 " + username);
+
+      navigate("/");
+    } else {
+      setErrorMessage("用户名或密码不正確");
     }
   };
 
