@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import Axios from "axios";
 import { AuthContext } from "../../context/auth-context";
 import "./user.css";
@@ -13,40 +13,59 @@ export const User = () => {
     setNickname,
     setPhone,
     setAddress,
-    isAdmin,
-    isUser,
+    isLoading,
   } = authContext;
 
-  const [contentId, setContentId] = useState("showuser");
-  const [editingUserId, setEditingUserId] = useState(userID);
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isUser, setIsUser] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userlist, setUserlist] = useState([]);
-  const [editedNickname, setEditedNickname] = useState("");
-  const [editedPhone, setEditedPhone] = useState("");
-  const [editedAddress, setEditedAddress] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // 新增加载状态
+
+  useEffect(() => {
+    console.log("isAdmin:", isAdmin);
+    console.log("isUser:", isUser);
+  }, [isAdmin, isUser]);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        // 模拟延迟加载
-        setTimeout(async () => {
-          const response = await Axios.get("http://localhost:3001/user", {
-            params: { userID: userID },
-          });
-          if (Array.isArray(response.data) && response.data.length > 0) {
+      const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
+
+      if (storedIsLoggedIn === "true") {
+        setIsLoggedIn(true);
+      }
+
+      const storedUserRole = localStorage.getItem("userrole");
+      if (storedUserRole === "1") {
+        setIsAdmin(true);
+      } else if (storedUserRole === "0") {
+        setIsUser(true);
+      }
+
+      if (isAdmin) {
+        try {
+          const response = await Axios.get("http://localhost:3001/user");
+
+          if (response.data.length > 0) {
             setUserlist(response.data);
-          } else {
-            console.log("Invalid user data received:", response.data);
+            console.log(response.data);
+          } else if (isUser) {
+            const response = await Axios.get("http://localhost:3001/user", {
+              params: { userID: userID },
+            });
+
+            if (response.data.length > 0) {
+              setUserlist(response.data);
+              console.log(response.data);
+            }
           }
-          setIsLoading(false); // 数据加载完成后设置加载状态为 false
-        }, 100); // 延迟时间为 0.1 秒
-      } catch (error) {
-        console.log("Error fetching user data:", error);
-        setIsLoading(false); // 发生错误时设置加载状态为 false
+        } catch (error) {
+          console.log("Error fetching user data:", error);
+        }
       }
     };
     fetchData();
-  }, [userID]);
+  }, [userID, setIsLoggedIn, setIsAdmin, setIsUser, setUserlist]);
 
   const handleEdit = (userId) => {
     console.log(`Editing user with userID: ${userId}`);
@@ -55,9 +74,9 @@ export const User = () => {
       // 如果是管理员或当前用户，允许编辑
       const currentUser = userlist.find((user) => user.userID === userId);
       if (currentUser) {
-        setEditedNickname(currentUser.nickname);
-        setEditedPhone(currentUser.phone);
-        setEditedAddress(currentUser.address);
+        setNickname(currentUser.nickname);
+        setPhone(currentUser.phone);
+        setAddress(currentUser.address);
         setEditingUserId(userId);
       }
     } else {
@@ -67,9 +86,9 @@ export const User = () => {
   };
 
   const handleSave = async (userId) => {
-    const editedNicknameToSend = editedNickname || null;
-    const editedPhoneToSend = editedPhone || null;
-    const editedAddressToSend = editedAddress || null;
+    const editedNicknameToSend = nickname || null;
+    const editedPhoneToSend = phone || null;
+    const editedAddressToSend = address || null;
     try {
       const response = await Axios.put("http://localhost:3001/user", {
         userID: userId,
@@ -78,10 +97,18 @@ export const User = () => {
         address: editedAddressToSend,
       });
 
-      // 更新 AuthContext 中的数据
-      setNickname(editedNicknameToSend);
-      setPhone(editedPhoneToSend);
-      setAddress(editedAddressToSend);
+      const updatedUserList = userlist.map((user) => {
+        if (user.userID === userId) {
+          return {
+            ...user,
+            nickname: editedNicknameToSend,
+            phone: editedPhoneToSend,
+            address: editedAddressToSend,
+          };
+        }
+        return user;
+      });
+      setUserlist(updatedUserList);
     } catch (error) {
       console.log(error);
     }
@@ -91,8 +118,15 @@ export const User = () => {
     setEditingUserId(null);
   };
 
-  const handleDelete = (id) => {
-    // 处理删除逻辑
+  const handleDelete = async (id) => {
+    try {
+      await Axios.delete(`http://localhost:3001/user/${id}`);
+
+      const updatedUserList = userlist.filter((user) => user.userID !== id);
+      setUserlist(updatedUserList);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleSidebarClick = (id) => {
@@ -100,52 +134,69 @@ export const User = () => {
   };
 
   const renderContent = () => {
-    if (userlist.length === 0) {
+    if (isLoading) {
       return <div>Loading...</div>;
     }
 
-    if (isAdmin) {
-      // 管理员角色显示所有用户数据
-      return (
-        <div className="showuser">
-          {userlist.map((user) => (
-            <div className="user" key={userID}>
-              <h3>Username: {user.username}</h3>
-              <h3>Nickname: {user.nickname}</h3>
-              <h3>Phone: {user.phone}</h3>
-              <h3>Address: {user.address}</h3>
-              <div className="user-buttons">
-                <button onClick={() => handleEdit(user.userID)}>修改</button>
-                <button onClick={() => handleDelete(user.userID)}>刪除</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    } else if (isUser) {
-      const currentUser = userlist.find((user) => user.userID === userID);
-      if (currentUser) {
-        console.log(currentUser.username)
+    if (contentId === "showuser") {
+      // 渲染用户资料
+      if (isAdmin) {
         return (
           <div className="showuser">
-            <div className="user" key={userID}>
-              <h3>Username: {currentUser.username}</h3>
-              <h3>Nickname: {currentUser.nickname}</h3>
-              <h3>Phone: {currentUser.phone}</h3>
-              <h3>Address: {currentUser.address}</h3>
-              <div className="user-buttons">
-                <button onClick={() => handleEdit(currentUser.userID)}>
-                  修改
-                </button>
+            {userlist.map((user) => (
+              <div className="user" key={userID}>
+                <h3>Username: {user.username}</h3>
+                <h3>Nickname: {user.nickname}</h3>
+                <h3>Phone: {user.phone}</h3>
+                <h3>Address: {user.address}</h3>
+                <div className="user-buttons">
+                  <button onClick={() => handleEdit(user.userID)}>修改</button>
+                  <button onClick={() => handleDelete(user.userID)}>
+                    刪除
+                  </button>
+                </div>
               </div>
-            </div>
+            ))}
+          </div>
+        );
+      } else if (isUser) {
+        return (
+          <div className="showuser">
+            {userlist.map((user) => (
+              <div className="user" key={userID}>
+                <h3>Username: {user.username}</h3>
+                <h3>Nickname: {user.nickname}</h3>
+                <h3>Phone: {user.phone}</h3>
+                <h3>Address: {user.address}</h3>
+                <div className="user-buttons">
+                  <button onClick={() => handleEdit(user.userID)}>修改</button>
+                  <button onClick={() => handleDelete(user.userID)}>
+                    刪除
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         );
       }
+    } else if (contentId === "orderhistory") {
+      return (
+        <div className="orderhistorypage">
+          <h1>订单记录</h1>
+        </div>
+      );
+    } else if (contentId === "faq") {
+      return (
+        <div className="faqpage">
+          <h1>常见问题</h1>
+        </div>
+      );
     }
 
     return null;
   };
+
+  const [contentId, setContentId] = useState("showuser");
 
   return (
     <div className="userpage">

@@ -34,13 +34,6 @@ export const AuthContextProvider = ({ children }) => {
     if (storedIsLoggedIn === "true") {
       setIsLoggedIn(true);
     }
-    
-    if (localStorage.getItem(localStorageKeys.userrole)==="1"){
-      setIsAdmin(true);
-    } else {
-      setIsUser(true);
-    }
-
   }, []);
 
   const login = async (userID, username, nickname, phone, address, userrole) => {
@@ -62,9 +55,11 @@ export const AuthContextProvider = ({ children }) => {
 
     if (userrole === "1") {
       setIsAdmin(true);
+      console.log("isAdmin set to true");
       localStorage.setItem(localStorageKeys.userrole, userrole);
     } else if (userrole === "0") {
       setIsUser(true);
+      console.log("isUser set to true");
       localStorage.setItem(localStorageKeys.userrole, userrole);
     }
   };
