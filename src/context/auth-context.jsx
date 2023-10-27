@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext({
   username: "",
   userID: null,
-  login: () => {},
+  Login: () => {},
   logout: () => {},
   setUserID: (userID) => {},
   setNickname: (nickname) => {},
@@ -22,66 +22,57 @@ export const AuthContextProvider = ({ children }) => {
     nickname: "nickname",
     phone: "phone",
     address: "address",
-    userrole: "userrole"
+    role: "role", // 修改键名为 "role"
   };
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isUser, setIsUser] = useState(false);
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const storedIsLoggedIn = localStorage.getItem(localStorageKeys.isLoggedIn);
-  
+
     if (storedIsLoggedIn === "true") {
       setIsLoggedIn(true);
     }
   }, []);
 
-  const login = async (userID, username, nickname, phone, address, userrole) => {
+  const Login = async (userID, username, nickname, phone, address, userrole) => {
     const userInfo = {
       userID,
       username,
       nickname,
       phone,
       address,
-      userrole
+      role: userrole,
     };
-
+  
     for (const key of Object.keys(userInfo)) {
       localStorage.setItem(localStorageKeys[key], userInfo[key]);
     }
-
+  
     localStorage.setItem(localStorageKeys.isLoggedIn, "true");
+  
     setIsLoggedIn(true);
-
-    if (userrole === "1") {
-      setIsAdmin(true);
-      console.log("isAdmin set to true");
-      localStorage.setItem(localStorageKeys.userrole, userrole);
-    } else if (userrole === "0") {
-      setIsUser(true);
-      console.log("isUser set to true");
-      localStorage.setItem(localStorageKeys.userrole, userrole);
-    }
+  
   };
+
 
   const logout = () => {
     for (const key in localStorageKeys) {
       localStorage.removeItem(localStorageKeys[key]);
     }
-
+  
     localStorage.removeItem(localStorageKeys.username);
-    localStorage.removeItem(localStorageKeys.isLoggedIn); // 更新本地存储中的 isLoggedIn 值
-    localStorage.removeItem(localStorageKeys.userrole);
-
-    setIsAdmin(false);
-    setIsUser(false);
+    localStorage.removeItem(localStorageKeys.isLoggedIn);
+    localStorage.removeItem(localStorageKeys.role); // 修改为正确的键名 role
+  
     setIsLoggedIn(false);
   };
 
   const authContextValue = {
+
     username: localStorage.getItem(localStorageKeys.username) || "",
     userID: localStorage.getItem(localStorageKeys.userID) || null,
-    login,
+    Login,
     logout,
     setUserID: (userID) => {
       localStorage.setItem(localStorageKeys.userID, userID);
@@ -96,8 +87,6 @@ export const AuthContextProvider = ({ children }) => {
       localStorage.setItem(localStorageKeys.address, address);
     },
     isLoggedIn,
-    isAdmin,
-    isUser,
   };
 
   return (

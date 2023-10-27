@@ -99,7 +99,7 @@ app.get("/user", async (req, res) => {
 
   try {
     const query = `SELECT username, nickname, phone, address, userrole FROM userdb WHERE userID = ?`;
-    const [rows, fields] = await db.execute(query, [userID || null]);
+    const [rows, fields] = await db.execute(query, [userID]);
     res.send(rows);
   } catch (error) {
     console.log(error);
@@ -109,7 +109,7 @@ app.get("/user", async (req, res) => {
 
 app.put("/user", async (req, res) => {
   const { userID, nickname, phone, address } = req.body;
-
+  console.log(userID)
   try {
     const params = [nickname || null, phone || null, address || null];
     console.log("Received userID:", userID);

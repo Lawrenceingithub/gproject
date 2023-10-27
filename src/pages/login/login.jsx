@@ -23,7 +23,7 @@ export const Login = () => {
       if (response.status === 200) {
         const { userID, username, nickname, phone, address, userrole } = response.data;
 
-        authContext.login(userID, username, nickname, phone, address, userrole);
+        authContext.Login(userID, username, nickname, phone, address, userrole);
         
         setUsername(username);
         alert("歡迎 " + username);

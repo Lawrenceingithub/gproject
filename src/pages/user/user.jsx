@@ -1,7 +1,7 @@
-import React, { useEffect, useContext, useState } from "react";
-import Axios from "axios";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/auth-context";
 import "./user.css";
+import axios from "axios";
 
 export const User = () => {
   const authContext = useContext(AuthContext);
@@ -13,119 +13,99 @@ export const User = () => {
     setNickname,
     setPhone,
     setAddress,
-    isLoading,
+    isAdmin,
+    isUser,
   } = authContext;
 
-  const [editingUserId, setEditingUserId] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isUser, setIsUser] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [contentId, setContentId] = useState("showuser");
   const [userlist, setUserlist] = useState([]);
+  const [editedNickname, setEditedNickname] = useState("");
+  const [editedPhone, setEditedPhone] = useState("");
+  const [editedAddress, setEditedAddress] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    console.log("isAdmin:", isAdmin);
-    console.log("isUser:", isUser);
-  }, [isAdmin, isUser]);
+    fetchUserList();
+  }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
-
-      if (storedIsLoggedIn === "true") {
-        setIsLoggedIn(true);
-      }
-
-      const storedUserRole = localStorage.getItem("userrole");
-      if (storedUserRole === "1") {
-        setIsAdmin(true);
-      } else if (storedUserRole === "0") {
-        setIsUser(true);
-      }
-
-      if (isAdmin) {
-        try {
-          const response = await Axios.get("http://localhost:3001/user");
-
-          if (response.data.length > 0) {
-            setUserlist(response.data);
-            console.log(response.data);
-          } else if (isUser) {
-            const response = await Axios.get("http://localhost:3001/user", {
-              params: { userID: userID },
-            });
-
-            if (response.data.length > 0) {
-              setUserlist(response.data);
-              console.log(response.data);
-            }
-          }
-        } catch (error) {
-          console.log("Error fetching user data:", error);
-        }
-      }
-    };
-    fetchData();
-  }, [userID, setIsLoggedIn, setIsAdmin, setIsUser, setUserlist]);
-
-  const handleEdit = (userId) => {
-    console.log(`Editing user with userID: ${userId}`);
-
-    if (isAdmin || userId === userID) {
-      // 如果是管理员或当前用户，允许编辑
-      const currentUser = userlist.find((user) => user.userID === userId);
-      if (currentUser) {
-        setNickname(currentUser.nickname);
-        setPhone(currentUser.phone);
-        setAddress(currentUser.address);
-        setEditingUserId(userId);
-      }
-    } else {
-      // 如果不是管理员且不是当前用户，不允许编辑
-      alert("您没有权限编辑该用户的数据");
+  const fetchUserList = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3001/user?userID=${userID}`);
+      const currentUser = response.data[0];
+      setUserlist([currentUser]);
+    } catch (error) {
+      console.log("Error fetching user list:", error);
     }
   };
 
-  const handleSave = async (userId) => {
-    const editedNicknameToSend = nickname || null;
-    const editedPhoneToSend = phone || null;
-    const editedAddressToSend = address || null;
-    try {
-      const response = await Axios.put("http://localhost:3001/user", {
-        userID: userId,
-        nickname: editedNicknameToSend,
-        phone: editedPhoneToSend,
-        address: editedAddressToSend,
-      });
+  const handleEdit = async () => {
+    console.log("Editing user with userID:", userID);
 
-      const updatedUserList = userlist.map((user) => {
-        if (user.userID === userId) {
-          return {
-            ...user,
-            nickname: editedNicknameToSend,
-            phone: editedPhoneToSend,
-            address: editedAddressToSend,
-          };
-        }
-        return user;
-      });
-      setUserlist(updatedUserList);
+    try {
+      const response = await axios.get(`http://localhost:3001/user?userID=${userID}`);
+      const currentUser = response.data[0];
+      console.log("Current user:", currentUser);
+
+      setEditedNickname(currentUser.nickname);
+      setEditedPhone(currentUser.phone);
+      setEditedAddress(currentUser.address);
+      setIsEditing(true);
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching user information:", error);
+    }
+  };
+
+  const handleSave = async () => {
+    console.log("Saving user with userID:", userID);
+    try {
+      const updatedUser = {
+        nickname: editedNickname,
+        phone: editedPhone,
+        address: editedAddress,
+      };
+  
+      await axios.put(`http://localhost:3001/user`, updatedUser, {
+        params: {
+          userID: userID, // 设置正确的userID值
+        },
+      });
+  
+      // 更新 AuthContext 中的数据
+      setNickname(editedNickname);
+      setPhone(editedPhone);
+      setAddress(editedAddress);
+  
+      // 重新获取用户列表
+      fetchUserList();
+  
+      setIsEditing(false);
+    } catch (error) {
+      console.log("Error saving user information:", error);
     }
   };
 
   const handleCancelEdit = () => {
-    setEditingUserId(null);
+    setIsEditing(false);
+    console.log("Cancel editing");
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await Axios.delete(`http://localhost:3001/user/${id}`);
+  const handleDelete = async (userId) => {
+    if (isAdmin) {
+      try {
+        await axios.delete(`/api/users/${userId}`);
 
-      const updatedUserList = userlist.filter((user) => user.userID !== id);
-      setUserlist(updatedUserList);
-    } catch (error) {
-      console.log(error);
+        // 如果删除的是当前用户，则清除 AuthContext 中的数据
+        if (userId === userID) {
+          setNickname("");
+          setPhone("");
+          setAddress("");
+        }
+
+        // 重新获取用户列表
+        fetchUserList();
+      } catch (error) {
+        console.log("Error deleting user:", error);
+      }
     }
   };
 
@@ -133,70 +113,67 @@ export const User = () => {
     setContentId(id);
   };
 
+
   const renderContent = () => {
-    if (isLoading) {
+    if (userlist.length === 0) {
       return <div>Loading...</div>;
     }
-
-    if (contentId === "showuser") {
-      // 渲染用户资料
-      if (isAdmin) {
-        return (
-          <div className="showuser">
-            {userlist.map((user) => (
-              <div className="user" key={userID}>
-                <h3>Username: {user.username}</h3>
-                <h3>Nickname: {user.nickname}</h3>
-                <h3>Phone: {user.phone}</h3>
-                <h3>Address: {user.address}</h3>
-                <div className="user-buttons">
-                  <button onClick={() => handleEdit(user.userID)}>修改</button>
-                  <button onClick={() => handleDelete(user.userID)}>
-                    刪除
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-      } else if (isUser) {
-        return (
-          <div className="showuser">
-            {userlist.map((user) => (
-              <div className="user" key={userID}>
-                <h3>Username: {user.username}</h3>
-                <h3>Nickname: {user.nickname}</h3>
-                <h3>Phone: {user.phone}</h3>
-                <h3>Address: {user.address}</h3>
-                <div className="user-buttons">
-                  <button onClick={() => handleEdit(user.userID)}>修改</button>
-                  <button onClick={() => handleDelete(user.userID)}>
-                    刪除
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-      }
-    } else if (contentId === "orderhistory") {
+  
+    const currentUser = userlist[0];
+  
+    if (isEditing) {
       return (
-        <div className="orderhistorypage">
-          <h1>订单记录</h1>
-        </div>
-      );
-    } else if (contentId === "faq") {
-      return (
-        <div className="faqpage">
-          <h1>常见问题</h1>
+        <div className="edituser">
+          <div className="user" key={currentUser.id}>
+            <h3>Username: {currentUser.username}</h3>
+            <h3><label>
+              Nickname:
+              <input
+                type="text"
+                value={editedNickname}
+                onChange={(e) => setEditedNickname(e.target.value)}
+              />
+            </label></h3>
+            <h3><label>
+              Phone:
+              <input
+                type="text"
+                value={editedPhone}
+                onChange={(e) => setEditedPhone(e.target.value)}
+              />
+            </label></h3>
+            <h3><label>
+              Address:
+              <input
+                type="text"
+                value={editedAddress}
+                onChange={(e) => setEditedAddress(e.target.value)}
+              />
+            </label></h3>
+            <div className="user-buttons">
+              <button onClick={() => handleSave(currentUser.id)}>保存</button>
+              <button onClick={handleCancelEdit}>取消</button>
+            </div>
+          </div>
         </div>
       );
     }
-
-    return null;
+  
+    return (
+      <div className="showuser">
+        <div className="user" key={currentUser.id}>
+          <h3>Username: {currentUser.username}</h3>
+          <h3>Nickname: {currentUser.nickname}</h3>
+          <h3>Phone: {currentUser.phone}</h3>
+          <h3>Address: {currentUser.address}</h3>
+          <div className="user-buttons">
+            <button onClick={() => handleEdit(currentUser.id)}>修改</button>
+            <button onClick={() => handleDelete(currentUser.id)}>删除</button>
+          </div>
+        </div>
+      </div>
+    );
   };
-
-  const [contentId, setContentId] = useState("showuser");
 
   return (
     <div className="userpage">
