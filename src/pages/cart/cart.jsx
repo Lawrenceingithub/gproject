@@ -11,17 +11,16 @@ export const Cart = () => {
   const totalAmount = getTotalCartAmount();
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
 
-const handleDeliveryMethod = (event) => {
-  setDeliveryMethod(event.target.value);
-};
+  const handleDeliveryMethod = (event) => {
+    setDeliveryMethod(event.target.value);
+  };
 
   const navigate = useNavigate();
 
   const authContext = useContext(AuthContext);
-  const { isLoggedIn, address } = authContext;
+  const { isLoggedIn, userID, username, address, phone } = authContext;
 
-  console.log(address)
-
+  console.log(userID, username, address, phone);
 
   const handleCheckout = () => {
     if (isLoggedIn) {
@@ -45,7 +44,7 @@ const handleDeliveryMethod = (event) => {
           return null;
         })}
       </div>
-  
+
       {totalAmount > 0 ? (
         <div className="checkout">
           <div>
@@ -70,5 +69,4 @@ const handleDeliveryMethod = (event) => {
       )}
     </div>
   );
-  
 };

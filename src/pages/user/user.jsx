@@ -2,10 +2,12 @@ import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/auth-context";
 import "./user.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const User = () => {
   const authContext = useContext(AuthContext);
   const {
+    logout,
     userID,
     nickname,
     phone,
@@ -23,6 +25,9 @@ export const User = () => {
   const [editedPhone, setEditedPhone] = useState("");
   const [editedAddress, setEditedAddress] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserList();
@@ -91,24 +96,27 @@ export const User = () => {
     console.log("Cancel editing");
   };
 
-  const handleDelete = async (userId) => {
-    if (isAdmin) {
+  const handleDelete = async () => {
+    console.log(userID)
+    console.log("Deleting");
       try {
-        await axios.delete(`/api/users/${userId}`);
+        await axios.delete(`http://localhost:3001/user?userID=${userID}`);
 
         // 如果删除的是当前用户，则清除 AuthContext 中的数据
-        if (userId === userID) {
+        if (userID === userID) {
           setNickname("");
           setPhone("");
           setAddress("");
         }
+        
+        alert("刪除成功，現返回首頁")
+        navigate("/")
 
-        // 重新获取用户列表
-        fetchUserList();
+        logout();
+
       } catch (error) {
         console.log("Error deleting user:", error);
       }
-    }
   };
 
   const handleSidebarClick = (id) => {

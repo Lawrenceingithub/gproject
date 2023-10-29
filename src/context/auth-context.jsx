@@ -28,7 +28,12 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [userID, setUserID] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [userrole, setUserrole] = useState("");
 
   useEffect(() => {
     const storedIsLoggedIn = localStorage.getItem(localStorageKeys.isLoggedIn);
@@ -53,7 +58,10 @@ export const AuthContextProvider = ({ children }) => {
     }
   
     localStorage.setItem(localStorageKeys.isLoggedIn, "true");
-
+    setUserID(userID);
+    setUsername(username);
+    setNickname(nickname);
+    setPhone(phone);
     setAddress(address);
     setIsLoggedIn(true);
   
@@ -74,22 +82,18 @@ export const AuthContextProvider = ({ children }) => {
 
   const authContextValue = {
 
-    username: localStorage.getItem(localStorageKeys.username) || "",
-    userID: localStorage.getItem(localStorageKeys.userID) || null,
+    username,
+    userID,
+    nickname,
+    phone,
+    address,
+    userrole,
     Login,
     logout,
-    setUserID: (userID) => {
-      localStorage.setItem(localStorageKeys.userID, userID);
-    },
-    setNickname: (nickname) => {
-      localStorage.setItem(localStorageKeys.nickname, nickname);
-    },
-    setPhone: (phone) => {
-      localStorage.setItem(localStorageKeys.phone, phone);
-    },
-    setAddress: (address) => {
-      localStorage.setItem(localStorageKeys.address, address);
-    },
+    setUserID,
+    setNickname,
+    setPhone,
+    setAddress,
     isLoggedIn,
   };
 

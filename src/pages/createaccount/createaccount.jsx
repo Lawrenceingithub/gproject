@@ -29,9 +29,11 @@ export const Createaccount = () => {
   
         if (response.status === 200) {
           // 注册成功
-          const { userID, username, userrole } = response.data;
-          authContext.login(username, userrole, userID);
+          const { userID, username, nickname, phone, address, userrole } = response.data;
+          authContext.Login(userID, username, nickname, phone, address, userrole);
+          alert("注冊成功");
           navigate('/');
+
         }
       } else {
         setErrorMessage("用户名和密码不能为空");

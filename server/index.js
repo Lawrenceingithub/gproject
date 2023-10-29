@@ -43,6 +43,7 @@ app.post("/login", async (req, res) => {
           address: user.address,
           userrole: user.userrole // 确保包括 userrole
         });
+        console.log([user]);
       } else {
         // 密码错误
         res.status(401).json({ error: "帳號或密碼錯誤" });
@@ -60,7 +61,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/createaccount", async (req, res) => {
   const { username, password, nickname, phone, address } = req.body;
-
+  console.log(req.body)
   try {
     const [existingUsers] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username]);
 
@@ -93,7 +94,7 @@ app.post("/createaccount", async (req, res) => {
   }
 });
 
-
+//取得用資料
 app.get("/user", async (req, res) => {
   const { userID } = req.query;
 
@@ -107,6 +108,7 @@ app.get("/user", async (req, res) => {
   }
 });
 
+//更新用戶
 app.put("/user", async (req, res) => {
   const { userID, nickname, phone, address } = req.body;
 
@@ -126,6 +128,24 @@ app.put("/user", async (req, res) => {
     res.status(500).send("出错：" + error.message);
   }
 });
+
+//刪除用戶
+app.delete("/user", async (req, res) => {
+  const { userID } = req.query;
+  console.log("Received userID for delete:", userID);
+
+  // 在这里，你可以编写逻辑来删除指定的用户
+  try {
+    // 删除用户的数据库记录，这里你应该根据你的数据库结构来执行删除操作
+    await db.execute("DELETE FROM userdb WHERE userID = ?", [userID]);
+
+    res.status(200).json({ message: "用户删除成功" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "删除用户时出错" });
+  }
+});
+
 
 app.post("/checkout", async (req, res) => {
   const { userID, username, cartItems } = req.body;
