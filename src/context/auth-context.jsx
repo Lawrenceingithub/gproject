@@ -1,8 +1,10 @@
 import React, { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext({
-  username: "",
   userID: null,
+  username: "",
+  address: "",
+  phone: "",
   Login: () => {},
   logout: () => {},
   setUserID: (userID) => {},
@@ -26,6 +28,7 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
     const storedIsLoggedIn = localStorage.getItem(localStorageKeys.isLoggedIn);
@@ -50,7 +53,8 @@ export const AuthContextProvider = ({ children }) => {
     }
   
     localStorage.setItem(localStorageKeys.isLoggedIn, "true");
-  
+
+    setAddress(address);
     setIsLoggedIn(true);
   
   };

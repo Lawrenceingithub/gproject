@@ -109,7 +109,7 @@ app.get("/user", async (req, res) => {
 
 app.put("/user", async (req, res) => {
   const { userID, nickname, phone, address } = req.body;
-  console.log(userID)
+
   try {
     const params = [nickname || null, phone || null, address || null];
     console.log("Received userID:", userID);
@@ -123,9 +123,73 @@ app.put("/user", async (req, res) => {
     res.send("更新成功");
   } catch (error) {
     console.log("Error:", error);
-    res.status(500).send("出错：" + error.message);  // 发送包含错误消息的响应
+    res.status(500).send("出错：" + error.message);
   }
 });
+
+app.post("/checkout", async (req, res) => {
+  const { userID, username, cartItems } = req.body;
+  let totalAmount = 0;
+  let orderID;
+
+  try {
+    // 创建订单
+    const [result] = await db.execute(
+      "INSERT INTO orders (userID, username, total_price, remark) VALUES (?, ?, ?, ?)",
+      [userID, username, totalAmount, "Your order remark"]
+    );
+
+    // 获取生成的订单ID
+    orderID = result.insertId;
+
+    // 遍历购物车中的商品并插入订单商品表
+    for (const itemID in cartItems) {
+      const item = cartItems[itemID];
+      const product = PRODUCTS.find((product) => product.id === Number(itemID));
+
+      if (product) {
+        const product_price = product.price;
+        const count = item.quantity;
+        const itemTotal = product_price * count;
+
+        // 将订单商品信息插入数据库
+        await db.execute(
+          "INSERT INTO order_items (orderID, productID, product_price, count, total_price) VALUES (?, ?, ?, ?, ?)",
+          [orderID, itemID, product_price, count, itemTotal]
+        );
+
+        // 更新订单总价格
+        totalAmount += itemTotal;
+      }
+    }
+
+    // 更新订单总价格
+    await db.execute(
+      "UPDATE orders SET total_price = ? WHERE orderID = ?",
+      [totalAmount, orderID]
+    );
+
+    res.status(200).json({ orderID, totalAmount });
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).json({ error: "创建订单时出错" });
+  }
+});
+
+app.get("/orderhistory", async (req, res) => {
+  try {
+    // 在这里查询数据库，获取订单数据
+    // 假设你有一个名为orders的数据库表存储了订单信息
+    const [rows, fields] = await db.execute("SELECT * FROM orders");
+
+    // 将订单数据发送到前端
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error("查询订单时出错:", error);
+    res.status(500).json({ error: "查询订单时出错" });
+  }
+});
+
 
 
 app.listen(3001, () => {

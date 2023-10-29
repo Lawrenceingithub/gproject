@@ -30,7 +30,9 @@ export const User = () => {
 
   const fetchUserList = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/user?userID=${userID}`);
+      const response = await axios.get(
+        `http://localhost:3001/user?userID=${userID}`
+      );
       const currentUser = response.data[0];
       setUserlist([currentUser]);
     } catch (error) {
@@ -42,7 +44,9 @@ export const User = () => {
     console.log("Editing user with userID:", userID);
 
     try {
-      const response = await axios.get(`http://localhost:3001/user?userID=${userID}`);
+      const response = await axios.get(
+        `http://localhost:3001/user?userID=${userID}`
+      );
       const currentUser = response.data[0];
       console.log("Current user:", currentUser);
 
@@ -57,27 +61,25 @@ export const User = () => {
 
   const handleSave = async () => {
     console.log("Saving user with userID:", userID);
+
     try {
       const updatedUser = {
+        userID, // 将 userID 放入请求体
         nickname: editedNickname,
         phone: editedPhone,
         address: editedAddress,
       };
-  
-      await axios.put(`http://localhost:3001/user`, updatedUser, {
-        params: {
-          userID: userID, // 设置正确的userID值
-        },
-      });
-  
+
+      await axios.put(`http://localhost:3001/user`, updatedUser);
+
       // 更新 AuthContext 中的数据
       setNickname(editedNickname);
       setPhone(editedPhone);
       setAddress(editedAddress);
-  
+
       // 重新获取用户列表
       fetchUserList();
-  
+
       setIsEditing(false);
     } catch (error) {
       console.log("Error saving user information:", error);
@@ -113,66 +115,78 @@ export const User = () => {
     setContentId(id);
   };
 
-
   const renderContent = () => {
     if (userlist.length === 0) {
       return <div>Loading...</div>;
     }
-  
+
     const currentUser = userlist[0];
-  
-    if (isEditing) {
+    if (contentId === "showuser") {
+      if (isEditing) {
+        return (
+          <div className="edituser">
+            <div className="user" key={currentUser.id}>
+              <h3>Username: {currentUser.username}</h3>
+              <h3>
+                <label>
+                  Nickname:
+                  <input
+                    type="text"
+                    value={editedNickname}
+                    onChange={(e) => setEditedNickname(e.target.value)}
+                  />
+                </label>
+              </h3>
+              <h3>
+                <label>
+                  Phone:
+                  <input
+                    type="text"
+                    value={editedPhone}
+                    onChange={(e) => setEditedPhone(e.target.value)}
+                  />
+                </label>
+              </h3>
+              <h3>
+                <label>
+                  Address:
+                  <input
+                    type="text"
+                    value={editedAddress}
+                    onChange={(e) => setEditedAddress(e.target.value)}
+                  />
+                </label>
+              </h3>
+              <div className="user-buttons">
+                <button onClick={() => handleSave(currentUser.id)}>保存</button>
+                <button onClick={handleCancelEdit}>取消</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       return (
-        <div className="edituser">
+        <div className="showuser">
           <div className="user" key={currentUser.id}>
             <h3>Username: {currentUser.username}</h3>
-            <h3><label>
-              Nickname:
-              <input
-                type="text"
-                value={editedNickname}
-                onChange={(e) => setEditedNickname(e.target.value)}
-              />
-            </label></h3>
-            <h3><label>
-              Phone:
-              <input
-                type="text"
-                value={editedPhone}
-                onChange={(e) => setEditedPhone(e.target.value)}
-              />
-            </label></h3>
-            <h3><label>
-              Address:
-              <input
-                type="text"
-                value={editedAddress}
-                onChange={(e) => setEditedAddress(e.target.value)}
-              />
-            </label></h3>
+            <h3>Nickname: {currentUser.nickname}</h3>
+            <h3>Phone: {currentUser.phone}</h3>
+            <h3>Address: {currentUser.address}</h3>
             <div className="user-buttons">
-              <button onClick={() => handleSave(currentUser.id)}>保存</button>
-              <button onClick={handleCancelEdit}>取消</button>
+              <button onClick={() => handleEdit(currentUser.id)}>修改</button>
+              <button onClick={() => handleDelete(currentUser.id)}>删除</button>
             </div>
           </div>
         </div>
       );
+    } 
+    if (contentId === "orderhistory") {
+      return <h3>訂單記錄</h3>;
     }
-  
-    return (
-      <div className="showuser">
-        <div className="user" key={currentUser.id}>
-          <h3>Username: {currentUser.username}</h3>
-          <h3>Nickname: {currentUser.nickname}</h3>
-          <h3>Phone: {currentUser.phone}</h3>
-          <h3>Address: {currentUser.address}</h3>
-          <div className="user-buttons">
-            <button onClick={() => handleEdit(currentUser.id)}>修改</button>
-            <button onClick={() => handleDelete(currentUser.id)}>删除</button>
-          </div>
-        </div>
-      </div>
-    );
+    if (contentId === "faq") {
+      return <h3>常見問題</h3>;
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ShopContext } from "../../context/shop-context";
 import { AuthContext } from "../../context/auth-context";
 import { PRODUCTS } from "../../products";
@@ -9,11 +9,19 @@ import "./cart.css";
 export const Cart = () => {
   const { cartItems, getTotalCartAmount, checkout } = useContext(ShopContext);
   const totalAmount = getTotalCartAmount();
+  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
+
+const handleDeliveryMethod = (event) => {
+  setDeliveryMethod(event.target.value);
+};
 
   const navigate = useNavigate();
 
   const authContext = useContext(AuthContext);
-  const { isLoggedIn } = authContext;
+  const { isLoggedIn, address } = authContext;
+
+  console.log(address)
+
 
   const handleCheckout = () => {
     if (isLoggedIn) {
@@ -36,13 +44,24 @@ export const Cart = () => {
           }
           return null;
         })}
-        <h1>配送方式</h1>
-        <slelectoption id="selfpickup"value="自取"/>
       </div>
-
+  
       {totalAmount > 0 ? (
         <div className="checkout">
-          <b><p> 總計: ${totalAmount} </p></b>
+          <div>
+            <h1>配送方式：</h1>
+            <select onChange={handleDeliveryMethod}>
+              <option value="delivery">送貨：{address}</option>
+              <option value="pickup1">自取：地點1</option>
+              <option value="pickup2">自取：地點2</option>
+            </select>
+            <h1>備注：</h1>
+            <input></input>
+          </div>
+
+          <b>
+            <p> 總計: ${totalAmount} </p>
+          </b>
           <button onClick={() => navigate("/")}> 繼續購物 </button>
           <button onClick={handleCheckout}> 結算 </button>
         </div>
@@ -51,4 +70,5 @@ export const Cart = () => {
       )}
     </div>
   );
+  
 };
