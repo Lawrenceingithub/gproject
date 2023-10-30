@@ -10,17 +10,16 @@ export const Cart = () => {
   const { cartItems, getTotalCartAmount, checkout } = useContext(ShopContext);
   const totalAmount = getTotalCartAmount();
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
+  const [orderNotes, setOrderNotes] = useState("");
 
-  const handleDeliveryMethod = (event) => {
-    setDeliveryMethod(event.target.value);
+  const handleDeliveryMethod = (e) => {
+    setDeliveryMethod(e.target.value);
   };
 
   const navigate = useNavigate();
 
   const authContext = useContext(AuthContext);
   const { isLoggedIn, userID, username, address, phone } = authContext;
-
-  console.log(userID, username, address, phone);
 
   const handleCheckout = () => {
     if (isLoggedIn) {
@@ -55,7 +54,11 @@ export const Cart = () => {
               <option value="pickup2">自取：地點2</option>
             </select>
             <h1>備注：</h1>
-            <input></input>
+            <input
+              type="text"
+              value={orderNotes}
+              onChange={(e) => setOrderNotes(e.target.value)}
+            />
           </div>
 
           <b>

@@ -24,7 +24,7 @@ export const AuthContextProvider = ({ children }) => {
     nickname: "nickname",
     phone: "phone",
     address: "address",
-    role: "role", // 修改键名为 "role"
+    userrole: "userrole",
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -50,7 +50,7 @@ export const AuthContextProvider = ({ children }) => {
       nickname,
       phone,
       address,
-      role: userrole,
+      userrole
     };
   
     for (const key of Object.keys(userInfo)) {
@@ -59,6 +59,7 @@ export const AuthContextProvider = ({ children }) => {
   
     localStorage.setItem(localStorageKeys.isLoggedIn, "true");
     setUserID(userID);
+    setUserrole(userrole);
     setUsername(username);
     setNickname(nickname);
     setPhone(phone);
@@ -72,11 +73,12 @@ export const AuthContextProvider = ({ children }) => {
     for (const key in localStorageKeys) {
       localStorage.removeItem(localStorageKeys[key]);
     }
-  
-    localStorage.removeItem(localStorageKeys.username);
-    localStorage.removeItem(localStorageKeys.isLoggedIn);
-    localStorage.removeItem(localStorageKeys.role); // 修改为正确的键名 role
-  
+    setUserID("");
+    setUserrole("");
+    setUsername("");
+    setNickname("");
+    setPhone("");
+    setAddress("");
     setIsLoggedIn(false);
   };
 
@@ -95,6 +97,7 @@ export const AuthContextProvider = ({ children }) => {
     setPhone,
     setAddress,
     isLoggedIn,
+
   };
 
   return (

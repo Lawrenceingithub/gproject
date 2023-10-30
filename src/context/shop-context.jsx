@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import { PRODUCTS } from "../products";
 
 export const ShopContext = createContext(null);
@@ -11,8 +11,21 @@ const getDefaultCart = () => {
   return cart;
 };
 
-export const ShopContextProvider = (props) => {
+export const ShopContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
+
+  useEffect(() => {
+    // 在组件加载时，从LocalStorage加载购物车数据
+    const storedCart = localStorage.getItem("cartItems");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
+  }, []);
+
+  useEffect(() => {
+    // 每当购物车数据更改时，保存到LocalStorage
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
@@ -42,6 +55,7 @@ export const ShopContextProvider = (props) => {
   };
 
   const checkout = () => {
+
     setCartItems(getDefaultCart());
   };
 
@@ -56,7 +70,7 @@ export const ShopContextProvider = (props) => {
 
   return (
     <ShopContext.Provider value={contextValue}>
-      {props.children}
+      {children}
     </ShopContext.Provider>
   );
 };

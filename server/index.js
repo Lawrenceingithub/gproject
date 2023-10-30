@@ -3,6 +3,7 @@ const app = express();
 const mysql = require("mysql2/promise");
 const cors = require("cors");
 const bcrypt = require('bcrypt');
+const { Note } = require("phosphor-react");
 
 app.use(cors());
 app.use(express.json());
@@ -155,8 +156,8 @@ app.post("/checkout", async (req, res) => {
   try {
     // 创建订单
     const [result] = await db.execute(
-      "INSERT INTO orders (userID, username, total_price, remark) VALUES (?, ?, ?, ?)",
-      [userID, username, totalAmount, "Your order remark"]
+      "INSERT INTO orders (userID, username, total_price, remark, createdate) VALUES (?, ?, ?, ?, now())",
+      [userID, username, totalAmount, Note]
     );
 
     // 获取生成的订单ID

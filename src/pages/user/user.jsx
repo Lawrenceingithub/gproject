@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 export const User = () => {
   const authContext = useContext(AuthContext);
   const {
+    isLoggedIn,
     logout,
     userID,
     nickname,
@@ -15,8 +16,6 @@ export const User = () => {
     setNickname,
     setPhone,
     setAddress,
-    isAdmin,
-    isUser,
   } = authContext;
 
   const [contentId, setContentId] = useState("showuser");
@@ -25,7 +24,6 @@ export const User = () => {
   const [editedPhone, setEditedPhone] = useState("");
   const [editedAddress, setEditedAddress] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState("");
 
   const navigate = useNavigate();
 
@@ -69,7 +67,7 @@ export const User = () => {
 
     try {
       const updatedUser = {
-        userID, // 将 userID 放入请求体
+        userID,
         nickname: editedNickname,
         phone: editedPhone,
         address: editedAddress,
