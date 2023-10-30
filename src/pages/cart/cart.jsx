@@ -8,22 +8,25 @@ import "./cart.css";
 
 export const Cart = () => {
   const { cartItems, getTotalCartAmount, checkout } = useContext(ShopContext);
-  const totalAmount = getTotalCartAmount();
-  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
-  const [orderNotes, setOrderNotes] = useState("");
-
-  const handleDeliveryMethod = (e) => {
-    setDeliveryMethod(e.target.value);
-  };
-
-  const navigate = useNavigate();
 
   const authContext = useContext(AuthContext);
   const { isLoggedIn, userID, username, address, phone } = authContext;
 
+  const totalAmount = getTotalCartAmount();
+  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
+  const [orderNotes, setOrderNotes] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleDeliveryMethod = (e) => {
+    const selectedDeliveryMethod = e.target.value;
+    setDeliveryMethod(selectedDeliveryMethod);
+  };
+
+  // 当用户点击结算时，将购物车信息传递给checkout函数
   const handleCheckout = () => {
     if (isLoggedIn) {
-      checkout();
+      checkout(orderNotes, deliveryMethod);
       navigate("/checkout");
     } else {
       navigate("/login");
@@ -49,9 +52,9 @@ export const Cart = () => {
           <div>
             <h1>配送方式：</h1>
             <select onChange={handleDeliveryMethod}>
-              <option value="delivery">送貨：{address}</option>
-              <option value="pickup1">自取：地點1</option>
-              <option value="pickup2">自取：地點2</option>
+              <option value="1">送貨：{address}</option>
+              <option value="2">自取：地點1</option>
+              <option value="3">自取：地點2</option>
             </select>
             <h1>備注：</h1>
             <input
