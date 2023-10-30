@@ -15,7 +15,7 @@ const connectToDatabase = async () => {
       user: "root",
       host: "localhost",
       password: "QWEasd123",
-      database: "shopdb",
+      database: "employeesystem",
     });
     console.log("數據庫連接成功");
   } catch (error) {
@@ -135,9 +135,7 @@ app.delete("/user", async (req, res) => {
   const { userID } = req.query;
   console.log("Received userID for delete:", userID);
 
-  // 在这里，你可以编写逻辑来删除指定的用户
   try {
-    // 删除用户的数据库记录，这里你应该根据你的数据库结构来执行删除操作
     await db.execute("DELETE FROM userdb WHERE userID = ?", [userID]);
 
     res.status(200).json({ message: "用户删除成功" });
@@ -147,17 +145,18 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-
+//
 app.post("/checkout", async (req, res) => {
-  const { userID, username, cartItems } = req.body;
+  const { userID, username, cartItems, orderNotes, deliveryMethod } = req.body; // 添加 orderNotes 和 deliveryMethod
+  console.log(orderNotes)
   let totalAmount = 0;
   let orderID;
 
   try {
     // 创建订单
     const [result] = await db.execute(
-      "INSERT INTO orders (userID, username, total_price, remark, createdate) VALUES (?, ?, ?, ?, now())",
-      [userID, username, totalAmount, Note]
+      "INSERT INTO orders (userID, username, total_price, remark, createdate, deliveryMethod) VALUES (?, ?, ?, ?, now(), ?)", // 更新 SQL 查询以包括配送方式
+      [userID, username, totalAmount, orderNotes, deliveryMethod] // 添加 orderNotes 和 deliveryMethod
     );
 
     // 获取生成的订单ID
@@ -197,10 +196,11 @@ app.post("/checkout", async (req, res) => {
   }
 });
 
+
+// 查询订单数据
 app.get("/orderhistory", async (req, res) => {
   try {
-    // 在这里查询数据库，获取订单数据
-    // 假设你有一个名为orders的数据库表存储了订单信息
+
     const [rows, fields] = await db.execute("SELECT * FROM orders");
 
     // 将订单数据发送到前端

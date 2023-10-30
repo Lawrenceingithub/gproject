@@ -3,7 +3,7 @@ import { PRODUCTS } from "../products";
 
 export const ShopContext = createContext(null);
 
-const getDefaultCart = () => {
+export const getDefaultCart = () => {
   let cart = {};
   for (let i = 1; i < PRODUCTS.length + 1; i++) {
     cart[i] = 0;
@@ -13,8 +13,8 @@ const getDefaultCart = () => {
 
 export const ShopContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
-  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
-  const [orderNotes, setOrderNotes] = ("");
+  const [deliveryMethod, setDeliveryMethod] = useState("1");
+  const [orderNotes, setOrderNotes] = useState(""); // 修正初始化
 
   const addToCart = (itemId) => {
     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
@@ -29,7 +29,7 @@ export const ShopContextProvider = ({ children }) => {
       setCartItems((prev) => ({ ...prev, [itemId]: 0 }));
     } else {
       setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
-    };
+    }
   };
 
   const getTotalCartAmount = () => {
@@ -38,13 +38,14 @@ export const ShopContextProvider = ({ children }) => {
       if (cartItems[item] > 0) {
         let itemInfo = PRODUCTS.find((product) => product.id === Number(item));
         totalAmount += cartItems[item] * itemInfo.price;
-      };
-    };
+      }
+    }
     return totalAmount;
   };
 
   const checkout = () => {
     setCartItems(getDefaultCart());
+    
   };
 
   useEffect(() => {
@@ -69,6 +70,8 @@ export const ShopContextProvider = ({ children }) => {
     checkout,
     deliveryMethod,
     orderNotes,
+    setDeliveryMethod, // 新增设置 deliveryMethod 的函数
+    setOrderNotes, // 新增设置 orderNotes 的函数
   };
 
   return (
@@ -77,3 +80,4 @@ export const ShopContextProvider = ({ children }) => {
     </ShopContext.Provider>
   );
 };
+

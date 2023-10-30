@@ -1,37 +1,75 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { ShopContext } from "../../context/shop-context";
-import { AuthContext } from "../../context/auth-context";
 import { PRODUCTS } from "../../products";
 import { CartItem } from "./cart-item";
 import { useNavigate } from "react-router-dom";
 import "./cart.css";
+import Axios from "axios";
+
+import { getDefaultCart } from "../../context/shop-context";
+import { AuthContext } from "../../context/auth-context";
 
 export const Cart = () => {
-  const { cartItems, getTotalCartAmount, checkout } = useContext(ShopContext);
-
   const authContext = useContext(AuthContext);
   const { isLoggedIn, userID, username, address, phone } = authContext;
+  const navigate = useNavigate();
+
+  const shopContext = useContext(ShopContext); // 获取 ShopContext
+
+  const { orderNotes, deliveryMethod, getTotalCartAmount, checkout, setOrderNotes, setDeliveryMethod } = shopContext;
 
   const totalAmount = getTotalCartAmount();
-  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
-  const [orderNotes, setOrderNotes] = useState("");
 
-  const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState(() => {
+    const storedCart = localStorage.getItem("cartItems");
+    return storedCart ? JSON.parse(storedCart) : getDefaultCart();
+  });
+
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const handleDeliveryMethod = (e) => {
     const selectedDeliveryMethod = e.target.value;
-    setDeliveryMethod(selectedDeliveryMethod);
+    setDeliveryMethod(selectedDeliveryMethod); // 使用 setDeliveryMethod 函数来更新值
   };
 
   // 当用户点击结算时，将购物车信息传递给checkout函数
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (isLoggedIn) {
-      checkout(orderNotes, deliveryMethod);
-      navigate("/checkout");
+      try {
+        const orderData = {
+          userID: userID,
+          username: username,
+          cartItems: cartItems,
+          remark: orderNotes,
+          deliveryMethod: deliveryMethod,
+        };
+  
+        const response = await Axios.post("http://localhost:3001/checkout", orderData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        if (response.status === 200) {
+          const responseData = response.data;
+          const orderNumber = responseData.orderID;
+  
+          setOrderNotes(""); // 清空 orderNotes
+          navigate("/checkout", { state: { orderNumber } }); // 传递订单号到checkout页面
+        } else {
+          console.error("Failed to submit the order");
+        }
+      } catch (error) {
+        console.error("Error during checkout:", error);
+        // 处理错误，如果有必要
+      }
     } else {
       navigate("/login");
     }
   };
+  
 
   return (
     <div className="cart">

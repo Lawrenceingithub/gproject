@@ -64,25 +64,28 @@ export const User = () => {
 
   const handleSave = async () => {
     console.log("Saving user with userID:", userID);
-
+  
     try {
+      // 获取用户信息从 userlist 数组
+      const currentUser = userlist[0];
+  
       const updatedUser = {
         userID,
         nickname: editedNickname,
         phone: editedPhone,
         address: editedAddress,
       };
-
+  
       await axios.put(`http://localhost:3001/user`, updatedUser);
-
+  
       // 更新 AuthContext 中的数据
       setNickname(editedNickname);
       setPhone(editedPhone);
       setAddress(editedAddress);
-
+  
       // 重新获取用户列表
       fetchUserList();
-
+  
       setIsEditing(false);
     } catch (error) {
       console.log("Error saving user information:", error);
@@ -95,26 +98,24 @@ export const User = () => {
   };
 
   const handleDelete = async () => {
-    console.log(userID)
-    console.log("Deleting");
-      try {
-        await axios.delete(`http://localhost:3001/user?userID=${userID}`);
+    console.log("Deleting user with userID:", userID);
+  
+    try {
+      await axios.delete(`http://localhost:3001/user?userID=${userID}`);
 
-        // 如果删除的是当前用户，则清除 AuthContext 中的数据
-        if (userID === userID) {
-          setNickname("");
-          setPhone("");
-          setAddress("");
-        }
-        
-        alert("刪除成功，現返回首頁")
-        navigate("/")
-
+ 
+        setNickname("");
+        setPhone("");
+        setAddress("");
+        // 退出登录
         logout();
-
-      } catch (error) {
-        console.log("Error deleting user:", error);
-      }
+      
+      
+      alert("删除成功，现在返回首页");
+      navigate("/");
+    } catch (error) {
+      console.log("Error deleting user:", error);
+    }
   };
 
   const handleSidebarClick = (id) => {

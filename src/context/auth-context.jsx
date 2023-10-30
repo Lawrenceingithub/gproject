@@ -27,36 +27,52 @@ export const AuthContextProvider = ({ children }) => {
     userrole: "userrole",
   };
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
-  const [userID, setUserID] = useState("");
-  const [nickname, setNickname] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [userrole, setUserrole] = useState("");
-
-  useEffect(() => {
+  const initializeIsLoggedIn = () => {
     const storedIsLoggedIn = localStorage.getItem(localStorageKeys.isLoggedIn);
+    return storedIsLoggedIn === "true";
+  };
 
-    if (storedIsLoggedIn === "true") {
-      setIsLoggedIn(true);
-    }
-  }, []);
+  const [isLoggedIn, setIsLoggedIn] = useState(initializeIsLoggedIn);
+  const [username, setUsername] = useState(
+    localStorage.getItem(localStorageKeys.username) || ""
+  );
+  const [userID, setUserID] = useState(
+    localStorage.getItem(localStorageKeys.userID) || ""
+  );
+  const [nickname, setNickname] = useState(
+    localStorage.getItem(localStorageKeys.nickname) || ""
+  );
+  const [phone, setPhone] = useState(
+    localStorage.getItem(localStorageKeys.phone) || ""
+  );
+  const [address, setAddress] = useState(
+    localStorage.getItem(localStorageKeys.address) || ""
+  );
+  const [userrole, setUserrole] = useState(
+    localStorage.getItem(localStorageKeys.userrole) || ""
+  );
 
-  const Login = async (userID, username, nickname, phone, address, userrole) => {
+  const Login = async (
+    userID,
+    username,
+    nickname,
+    phone,
+    address,
+    userrole
+  ) => {
     const userInfo = {
       userID,
       username,
       nickname,
       phone,
       address,
-      userrole
+      userrole,
     };
-  
-    for (const key of Object.keys(userInfo)) {
-      localStorage.setItem(localStorageKeys[key], userInfo[key]);
-    }
-  
+
+    Object.entries(userInfo).forEach(([key, value]) => {
+      localStorage.setItem(localStorageKeys[key], value);
+    });
+
     localStorage.setItem(localStorageKeys.isLoggedIn, "true");
     setUserID(userID);
     setUserrole(userrole);
@@ -65,14 +81,12 @@ export const AuthContextProvider = ({ children }) => {
     setPhone(phone);
     setAddress(address);
     setIsLoggedIn(true);
-  
   };
 
-
   const logout = () => {
-    for (const key in localStorageKeys) {
-      localStorage.removeItem(localStorageKeys[key]);
-    }
+    Object.values(localStorageKeys).forEach((key) =>
+      localStorage.removeItem(key)
+    );
     setUserID("");
     setUserrole("");
     setUsername("");
@@ -83,7 +97,6 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   const authContextValue = {
-
     username,
     userID,
     nickname,
@@ -97,7 +110,6 @@ export const AuthContextProvider = ({ children }) => {
     setPhone,
     setAddress,
     isLoggedIn,
-
   };
 
   return (
