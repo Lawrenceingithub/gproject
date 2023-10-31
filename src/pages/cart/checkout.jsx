@@ -9,34 +9,6 @@ export const Checkout = () => {
   const [orderNumber, setOrderNumber] = useState('');
   const [orderTotal, setOrderTotal] = useState(0);
 
-  useEffect(() => {
-    // 在这里执行你的提交订单的逻辑，然后更新订单号和总金额
-
-    // 模拟异步提交订单，设置一个延迟
-    const simulateOrderSubmission = () => {
-      // 在这里执行提交订单的逻辑，模拟异步操作
-      const orderData = {
-        username,
-        address,
-        phone,
-        deliveryMethod,
-        orderNotes,
-        cartItems,
-      };
-
-      // 模拟服务器响应
-      setTimeout(() => {
-        const response = {
-          orderNumber: '123456',
-          orderTotal: 100, // 假设这里是订单的总金额
-        };
-        setOrderNumber(response.orderNumber);
-        setOrderTotal(response.orderTotal);
-      }, 2000); // 模拟2秒后服务器响应
-    };
-
-    simulateOrderSubmission();
-  }, [username, address, phone, deliveryMethod, orderNotes, cartItems]);
 
   return (
     <div className="checkoutcontent">

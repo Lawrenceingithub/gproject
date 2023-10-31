@@ -3,6 +3,8 @@ import { AuthContext } from "../../context/auth-context";
 import "./user.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { productupload } from "../shop/productupload";
+
 
 export const User = () => {
   const authContext = useContext(AuthContext);
@@ -16,6 +18,7 @@ export const User = () => {
     setNickname,
     setPhone,
     setAddress,
+    userrole,
   } = authContext;
 
   const [contentId, setContentId] = useState("showuser");
@@ -120,6 +123,9 @@ export const User = () => {
 
   const handleSidebarClick = (id) => {
     setContentId(id);
+    if (id === "upload") {
+      navigate("/upload"); 
+    }
   };
 
   const renderContent = () => {
@@ -208,8 +214,13 @@ export const User = () => {
         <button onClick={() => handleSidebarClick("faq")}>
           <h1>常见问题</h1>
         </button>
+        {userrole === "1" && (
+          <button onClick={() => handleSidebarClick("upload")}>
+            <h1>產品上傳</h1>
+          </button>
+        )}
       </div>
       <div className="maincontent">{renderContent()}</div>
     </div>
   );
-};
+}  

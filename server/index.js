@@ -3,7 +3,7 @@ const app = express();
 const mysql = require("mysql2/promise");
 const cors = require("cors");
 const bcrypt = require('bcrypt');
-const { Note } = require("phosphor-react");
+
 
 app.use(cors());
 app.use(express.json());
@@ -15,7 +15,7 @@ const connectToDatabase = async () => {
       user: "root",
       host: "localhost",
       password: "QWEasd123",
-      database: "employeesystem",
+      database: "shopdb",
     });
     console.log("數據庫連接成功");
   } catch (error) {
@@ -95,7 +95,7 @@ app.post("/createaccount", async (req, res) => {
   }
 });
 
-//取得用資料
+//取得用戶資料
 app.get("/user", async (req, res) => {
   const { userID } = req.query;
 
@@ -145,20 +145,20 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-//
+//创建订单
 app.post("/checkout", async (req, res) => {
   const { userID, username, cartItems, orderNotes, deliveryMethod } = req.body; // 添加 orderNotes 和 deliveryMethod
   console.log(orderNotes)
+  console.log(deliveryMethod)
   let totalAmount = 0;
   let orderID;
 
   try {
-    // 创建订单
+
     const [result] = await db.execute(
-      "INSERT INTO orders (userID, username, total_price, remark, createdate, deliveryMethod) VALUES (?, ?, ?, ?, now(), ?)", // 更新 SQL 查询以包括配送方式
+      "INSERT INTO orders (userID, username, total_price, orderNotes, createdate, deliveryMethod) VALUES (?, ?, ?, ?, now(), ?)", // 更新 SQL 查询以包括配送方式
       [userID, username, totalAmount, orderNotes, deliveryMethod] // 添加 orderNotes 和 deliveryMethod
     );
-
     // 获取生成的订单ID
     orderID = result.insertId;
 
@@ -210,6 +210,55 @@ app.get("/orderhistory", async (req, res) => {
     res.status(500).json({ error: "查询订单时出错" });
   }
 });
+
+
+const path = require('path');
+
+const uploadDirectory = path.join(__dirname, 'assets'); // 相对于服务器应用程序的根目录
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDirectory);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
+app.post('/upload', upload.single('picture'), async (req, res) => {
+  const { productname, price, detail, sort, storage, status, userID } = req.body;
+  const pictureData = req.file.buffer;
+
+  console.log(req.body);
+  console.log(pictureData);
+  console.log(req.file);
+
+  try {
+    if (!productname || !price || !detail || !sort || !storage || !status || !pictureData) {
+      return res.status(400).json({ error: '请填写所有信息' });
+    }
+
+    // 将产品信息和图片数据插入到数据库
+    const sql =
+      'INSERT INTO productsdb (productname, price, detail, sort, storage, status, picture, createdate, userID) VALUES (?, ?, ?, ?, ?, ?, now(), ?)';
+    const values = [productname, price, detail, sort, storage, status, pictureData, userID];
+
+    db.query(sql, values, (err, result) => {
+      if (err) {
+        console.error('Error inserting product into database:', err);
+        return res.status(500).json({ error: 'Error inserting product into database' });
+      }
+
+      res.status(200).json({ message: 'Product uploaded successfully' });
+    });
+  } catch (error) {
+    console.error('Error uploading product:', error);
+    res.status(500).send('Error uploading product');
+  }
+});
+
 
 
 

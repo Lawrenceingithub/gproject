@@ -3,8 +3,9 @@ import { ShopContext } from "../../context/shop-context";
 import { PRODUCTS } from "../../products";
 import { CartItem } from "./cart-item";
 import { useNavigate } from "react-router-dom";
-import "./cart.css";
 import Axios from "axios";
+import "./cart.css";
+
 
 import { getDefaultCart } from "../../context/shop-context";
 import { AuthContext } from "../../context/auth-context";
@@ -42,7 +43,7 @@ export const Cart = () => {
           userID: userID,
           username: username,
           cartItems: cartItems,
-          remark: orderNotes,
+          orderNotes: orderNotes,
           deliveryMethod: deliveryMethod,
         };
   
