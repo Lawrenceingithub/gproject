@@ -1,17 +1,4 @@
-.sidebar {
-  position: fixed;
-  width: 155px;
-  height: 100%;
-  background-color: black;
-  font-family: Arial, Helvetica, sans-serif;
-  opacity: 0.8;
-}
 
-.sidebar button {
-  font-size: 12px;
-  margin: 21px;
-  display: block; /* 将链接作为块级元素显示 */
-}
 
 .maincontent {
   position: relative;
@@ -23,16 +10,13 @@
 }
 
 .user {
-  padding: 10px; /* 调整为适当的内边距 */ 
+  margin-left: 10px; /* 调整为适当的内边距 */ 
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   /* 其他样式属性 */
 }
 
-.user h3 {
-  margin: 25px;
-}
 
 .user-buttons {
   margin-top: auto; /* 将按钮推到用户信息的中下方 */

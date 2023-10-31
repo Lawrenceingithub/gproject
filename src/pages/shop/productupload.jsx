@@ -70,7 +70,7 @@ export const ProductUpload = () => {
     <>
     <Sidebar />
     <div className='maincontent'>
-      <h1>产品上传</h1>
+      <h2>产品上传</h2>
       <form encType="multipart/form-data">
       <div>
         <label>产品名称: </label>
