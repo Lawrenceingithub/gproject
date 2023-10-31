@@ -79,14 +79,14 @@ export const Cart = () => {
       </div>
       <div className="cartdetail">
         {PRODUCTS.map((product) => {
-          if (cartItems[product.id] !== 0) {
-            return <CartItem data={product} />;
+          if (cartItems[product.id] === 0) {
+            return null;
           }
-          return null;
+          return <CartItem data={product} />;
         })}
       </div>
 
-      {totalAmount > 0 ? (
+      {totalAmount !== 0 ? (
         <div className="checkout">
           <div>
             <h1>配送方式：</h1>
