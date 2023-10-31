@@ -13,6 +13,7 @@ import { ProductUpload } from "./pages/shop/productupload";
 import { ProductDetail } from "./pages/shop/productdetail";
 import { Faq } from "./pages/shop/faq";
 import { Orderhistory } from "./pages/user/orderhistory";
+import { Userinfo } from "./pages/user/userinfo";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/upload" element={<ProductUpload />} />
               <Route path="/user" element={<User />} />
+              <Route path="/userinfo" element={<Userinfo />} />
               <Route path="/orderhistory" element={<Orderhistory />} />
               <Route path="/faq" element={<Faq />} />
 

@@ -4,6 +4,7 @@ import "./user.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { productupload } from "../shop/productupload";
+import { Sidebar } from "../../components/sidebar";
 
 
 export const User = () => {
@@ -194,33 +195,70 @@ export const User = () => {
         </div>
       );
     } 
-    if (contentId === "orderhistory") {
-      return <h3>訂單記錄</h3>;
-    }
-    if (contentId === "faq") {
-      return <h3>常見問題</h3>;
-    }
   };
 
   return (
-    <div className="userpage">
-      <div className="sidebar">
-        <button onClick={() => handleSidebarClick("showuser")}>
-          <h1>用户资料</h1>
-        </button>
-        <button onClick={() => handleSidebarClick("orderhistory")}>
-          <h1>订单记录</h1>
-        </button>
-        <button onClick={() => handleSidebarClick("faq")}>
-          <h1>常见问题</h1>
-        </button>
-        {userrole === "1" && (
-          <button onClick={() => handleSidebarClick("upload")}>
-            <h1>產品上傳</h1>
-          </button>
-        )}
-      </div>
-      <div className="maincontent">{renderContent()}</div>
-    </div>
+    <>
+      <Sidebar />
+      <div className="maincontent">
+      if (isEditing) {
+        return (
+          <div className="edituser">
+            <div className="user" key={currentUser.id}>
+              <h3>Username: {currentUser.username}</h3>
+              <h3>
+                <label>
+                  Nickname:
+                  <input
+                    type="text"
+                    value={editedNickname}
+                    onChange={(e) => setEditedNickname(e.target.value)}
+                  />
+                </label>
+              </h3>
+              <h3>
+                <label>
+                  Phone:
+                  <input
+                    type="text"
+                    value={editedPhone}
+                    onChange={(e) => setEditedPhone(e.target.value)}
+                  />
+                </label>
+              </h3>
+              <h3>
+                <label>
+                  Address:
+                  <input
+                    type="text"
+                    value={editedAddress}
+                    onChange={(e) => setEditedAddress(e.target.value)}
+                  />
+                </label>
+              </h3>
+              <div className="user-buttons">
+                <button onClick={() => handleSave(currentUser.id)}>保存</button>
+                <button onClick={handleCancelEdit}>取消</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="showuser">
+          <div className="user" key={currentUser.id}>
+            <h3>Username: {currentUser.username}</h3>
+            <h3>Nickname: {currentUser.nickname}</h3>
+            <h3>Phone: {currentUser.phone}</h3>
+            <h3>Address: {currentUser.address}</h3>
+            <div className="user-buttons">
+              <button onClick={() => handleEdit(currentUser.id)}>修改</button>
+              <button onClick={() => handleDelete(currentUser.id)}>删除</button>
+            </div>
+          </div>
+        </div>
+      );
+    </>
   );
 }  
