@@ -17,7 +17,7 @@ const navigate = useNavigate();
       <button onClick={()=>{navigate("/faq")}}>
           常見問題
       </button>
-      <button onClick={()=>{navigate("/upload")}}>
+      <button onClick={()=>{navigate("/productupload")}}>
           產品上傳
       </button>
     </div>

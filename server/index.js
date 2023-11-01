@@ -224,42 +224,35 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB限制
+});
 
-const upload = multer({ storage: storage });
-
-app.post('/upload', upload.single('picture'), async (req, res) => {
-  const { productname, price, detail, sort, storage, status, userID } = req.body;
-  const pictureData = req.file.buffer;
+app.post('/productupload', upload.single('picture'), async (req, res) => {
+  const { productname, price, detail, storage, userID, sort, status, picture } = req.body;
 
   console.log(req.body);
-  console.log(pictureData);
   console.log(req.file);
+  console.log(req.file.buffer);
 
   try {
-    if (!productname || !price || !detail || !sort || !storage || !status || !pictureData) {
-      return res.status(400).json({ error: '请填写所有信息' });
-    }
+    const [result, fields] = await db.execute("INSERT INTO productsdb (productname, price, detail, sort, storage, status, picture, createdate, userID) VALUES (?, ?, ?, ?, ?, ?, ?, now(), ?)",
+    [productname, price, detail, sort, storage, status, req.file.buffer || null , userID]);
 
-    // 将产品信息和图片数据插入到数据库
-    const sql =
-      'INSERT INTO productsdb (productname, price, detail, sort, storage, status, picture, createdate, userID) VALUES (?, ?, ?, ?, ?, ?, now(), ?)';
-    const values = [productname, price, detail, sort, storage, status, pictureData, userID];
-
-    db.query(sql, values, (err, result) => {
-      if (err) {
-        console.error('Error inserting product into database:', err);
-        return res.status(500).json({ error: 'Error inserting product into database' });
-      }
-
+    if (result.affectedRows > 0) {
       res.status(200).json({ message: 'Product uploaded successfully' });
-    });
+    } else {
+      console.error('Error inserting product into the database');
+      res.status(500).json({ error: 'Error inserting product into the database' });
+    }
+    
+
   } catch (error) {
     console.error('Error uploading product:', error);
     res.status(500).send('Error uploading product');
   }
 });
-
-
 
 
 app.listen(3001, () => {
