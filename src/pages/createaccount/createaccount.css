@@ -1,0 +1,44 @@
+.createaccount {
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px; /* 添加内边距 */
+    margin: 0 auto; /* 边框置中 */
+  }
+  
+  .userform {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin-top: 60px;
+  }
+  
+  .userform label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+
+  .userform input {
+    width: 250px;
+    height: 30px; /* 调整输入框的高度 */
+    font-size: 15px;
+    margin-top: 5px;
+  }
+  
+  .userform button {
+    width: 250px;
+    height: 30px; /* 调整按钮的高度 */
+    font-size: 20px;
+    margin-top: 5px;
+  }
+  
+  button:hover {
+    cursor: pointer;
+  }
