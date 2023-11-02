@@ -232,13 +232,12 @@ const upload = multer({
 app.post('/productupload', upload.single('picture'), async (req, res) => {
   const { productname, price, detail, storage, userID, sort, status, picture } = req.body;
 
-  console.log(req.body);
-  console.log(req.file);
-  console.log(req.file.buffer);
+  console.log('Parsed values:', productname, price, detail, storage, userID, sort, status);
+  console.log('Picture:', picture); // 输出上传的文件内容
 
   try {
     const [result, fields] = await db.execute("INSERT INTO productsdb (productname, price, detail, sort, storage, status, picture, createdate, userID) VALUES (?, ?, ?, ?, ?, ?, ?, now(), ?)",
-    [productname, price, detail, sort, storage, status, req.file.buffer || null , userID]);
+    [productname, price, detail, sort, storage, status, picture , userID]);
 
     if (result.affectedRows > 0) {
       res.status(200).json({ message: 'Product uploaded successfully' });
@@ -247,7 +246,6 @@ app.post('/productupload', upload.single('picture'), async (req, res) => {
       res.status(500).json({ error: 'Error inserting product into the database' });
     }
     
-
   } catch (error) {
     console.error('Error uploading product:', error);
     res.status(500).send('Error uploading product');

@@ -26,10 +26,18 @@ export const ProductUpload = () => {
   };
 
   const handleFileChange = (e) => {
-    setProductData({
-      ...productData,
-      picture: e.target.files[0],
-    });
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const binaryData = event.target.result;
+        setProductData({
+          ...productData,
+          picture: binaryData,
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    }
   };
 
   const handleUpload = async () => {
@@ -42,17 +50,8 @@ export const ProductUpload = () => {
       formData.append("storage", productData.storage);
       formData.append("status", productData.status);
       formData.append("userID", userID); // 附加 userID 到 formData
-  
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(productData.picture);
-      reader.onload = function () {
-        const arrayBuffer = reader.result;
+      formData.append("picture", productData.picture);
 
-        console.log(arrayBuffer)
-  
-        // 然后将 arrayBuffer 传递给后端
-        formData.append("picture", new Blob([arrayBuffer]));
-  
         // 发送请求
         Axios.post("http://localhost:3001/productupload", formData, {
           headers: {
@@ -70,7 +69,6 @@ export const ProductUpload = () => {
             console.error("Error uploading product. Response:", res);
           }
         });
-      };
     } catch (error) {
       console.error("Error uploading product:", error);
     }
