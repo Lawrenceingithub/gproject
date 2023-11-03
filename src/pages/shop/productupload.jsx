@@ -40,6 +40,7 @@ export const ProductUpload = () => {
     }
   };
 
+
   const handleUpload = async () => {
     try {
       const formData = new FormData();

@@ -1,27 +1,27 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { ShopContext } from "../../context/shop-context";
 import { Link } from "react-router-dom";
 import Axios from "axios"; // 引入 Axios
-import './productlist.css';
+import "./productlist.css";
 
 export const Productlist = () => {
-  const { addToCart, cartItems } = useContext(ShopContext);
-  const [ products, setProducts] = useState([]); // 用于存储产品数据的状态
+  const { addToCart, cartItems, products, setProducts } = useContext(ShopContext);
 
   useEffect(() => {
     // 在组件加载时获取产品数据
-    Axios.get("http://localhost:3001/productlist") // 请替换成后端路由的 URL
+    Axios.get("http://localhost:3001/productlist")
       .then((response) => {
-        setProducts(response.data); // 保存产品数据到状态
+        setProducts(response.data);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
       });
-  }, []); // 空依赖数组确保这个 effect 只运行一次
+  }, [setProducts]);
 
-  const handleAddToCart = (id) => {
-    addToCart(id);
+  const handleAddToCart = (productId) => {
+    addToCart(productId);
   };
+
 
   return (
     <div className="productlist">
@@ -30,30 +30,32 @@ export const Productlist = () => {
       </div>
 
       <div className="products">
-        {products.map((product) => (
-          <div className="product" key={product.productId}>
-            <Link to={`product/${product.productId}`}>
-              <img src={product.picture} alt={product.productname} />
-            </Link>
-            <div className="description">
-              <p>
-                <b>{product.productname}</b>
-              </p>
-              <p>${product.price}</p>
+        {products.map((product) => {
+          // 将图像数据转换为Base64字符串
+
+          return (
+            <div className="product" key={product.productId}>
+              <Link to={`product/${product.productId}`}>
+              <img src={`data:image/jpeg;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(product.picture)))}`} alt={product.productname} />
+              </Link>
+              <div className="description">
+                <p>
+                  <b>{product.productname}</b>
+                </p>
+                <p>${product.price}</p>
+              </div>
+              <button
+                className="addToCartBtn"
+                onClick={() => handleAddToCart(product.productId)}
+              >
+                加入購物車{" "}
+                {cartItems[product.productId] > 0 && (
+                  <>({cartItems[product.productId]})</>
+                )}
+              </button>
             </div>
-            <button
-              className="addToCartBtn"
-              onClick={() => handleAddToCart(product.productId)}
-            >
-              加入購物車{" "}
-              {cartItems[product.productId] > 0 && (
-                <>
-                  ({cartItems[product.productId]})
-                </>
-              )}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { Productlist } from "../pages/shop/productlist";
 
-export const ShopContext = createContext(null);
+export const ShopContext = createContext();
 
 export const getDefaultCart = () => {
   let cart = {};
@@ -17,27 +17,27 @@ export const ShopContextProvider = ({ children }) => {
   const [orderNotes, setOrderNotes] = useState(""); // 修正初始化
   const [products, setProducts] = useState([]);
 
-  const addToCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+  const addToCart = (productId) => {
+    setCartItems((prev) => ({ ...prev, [productId]: prev[productId] + 1 }));
   };
 
-  const removeFromCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+  const removeFromCart = (productId) => {
+    setCartItems((prev) => ({ ...prev, [productId]: prev[productId] - 1 }));
   };
 
-  const updateCartItemCount = (newAmount, itemId) => {
-    if (newAmount <= 0) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 0 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
+  const updateCartItemCount = (newAmount, productId) => {
+    if (newAmount < 0) {
+      // 防止负数输入
+      return;
     }
+    setCartItems((prev) => ({ ...prev, [productId]: newAmount }));
   };
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
-        let itemInfo = Productlist.find((product) => product.productId === Number(item));
+        let itemInfo = products.find((product) => product.productId === Number(item));
         totalAmount += cartItems[item] * itemInfo.price;
       }
     }
@@ -54,6 +54,9 @@ export const ShopContextProvider = ({ children }) => {
     const storedCart = localStorage.getItem("cartItems");
     if (storedCart) {
       setCartItems(JSON.parse(storedCart));
+    } else {
+      // 如果 localStorage 中没有购物车数据，设置一个默认的空购物车
+      setCartItems(getDefaultCart());
     }
   }, []);
 

@@ -1,30 +1,25 @@
 import React, { useContext } from "react";
 import { ShopContext } from "../../context/shop-context";
 import { AuthContext } from "../../context/auth-context";
-import { useParams, useNavigate } from "react-router-dom";
-import { Productlist } from "./productlist";
+import { useNavigate } from "react-router-dom";
 import "./productdetail.css";
 
 export const ProductDetail = () => {
+  const shopContext = useContext(ShopContext)
   const {
     addToCart,
     cartItems,
     removeFromCart,
     updateCartItemCount,
-    checkout,
-  } = useContext(ShopContext);
+    products,
+  } = shopContext;
 
   const authContext = useContext(AuthContext);
   const { isLoggedIn } = authContext;
-
   const navigate = useNavigate();
 
-  let params = useParams();
-  const productId = parseInt(params.id);
-  const productDetail = Productlist.find((product) => product.id === productId);
-
   const handleAddToCart = () => {
-    addToCart(params.id);
+    addToCart(products.productId);
   };
 
   const handleCheckout = () => {
@@ -35,7 +30,7 @@ export const ProductDetail = () => {
       navigate("/login");
     }
   };
-  if (!productDetail) {
+  if (!products) {
     return <div>產品不存在</div>;
   }
         
@@ -47,34 +42,34 @@ export const ProductDetail = () => {
             <tr>
               <td align="right">
                 <img
-                  src={productDetail.picture}
-                  alt={productDetail.productname}
+                  src={products.picture}
+                  alt={products.productname}
                   width="400"
                 />
               </td>
               <td width="45%" style={{ padding: "10px" }}>
-                <p>名稱 : {productDetail.productname}</p>
-                <p>售價 : {productDetail.price}元</p>
-                <p>描述 : {productDetail.detail}</p>
+                <p>名稱 : {products.productname}</p>
+                <p>售價 : {products.price}元</p>
+                <p>描述 : {products.detail}</p>
                 <div className="countHandler">
-                  {cartItems[params.id] <= 0 ? (
+                  {cartItems[products.productId] <= 0 ? (
                     <button onClick={handleAddToCart}>加入購物車</button>
                   ) : (
                     <>
-                      <button onClick={() => removeFromCart(params.id)}>
+                      <button onClick={() => removeFromCart(products.productId)}>
                         {" "}
                         -{" "}
                       </button>
                       <input
-                        value={cartItems[params.id]}
+                        value={cartItems[products.productId]}
                         onChange={(e) => {
                           updateCartItemCount(
                             Number(e.target.value),
-                            params.id
+                            products.productId
                           );
                         }}
                       />
-                      <button onClick={() => addToCart(params.id)}> + </button>
+                      <button onClick={() => addToCart(products.productId)}> + </button>
                     </>
                   )}
                 </div>

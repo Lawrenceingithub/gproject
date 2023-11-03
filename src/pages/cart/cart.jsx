@@ -5,19 +5,16 @@ import { useNavigate } from "react-router-dom";
 import Axios from "axios";
 import "./cart.css";
 
-
 import { getDefaultCart } from "../../context/shop-context";
 import { AuthContext } from "../../context/auth-context";
-import { Productlist } from "../shop/productlist";
 
 export const Cart = () => {
   const authContext = useContext(AuthContext);
   const { isLoggedIn, userID, username, address } = authContext;
   const navigate = useNavigate();
 
-  const shopContext = useContext(ShopContext); // 获取 ShopContext
-
-  const { orderNotes, deliveryMethod, getTotalCartAmount, checkout, setOrderNotes, setDeliveryMethod, products} = shopContext;
+  const shopContext = useContext(ShopContext); 
+  const { orderNotes, deliveryMethod, getTotalCartAmount, setOrderNotes, setDeliveryMethod, products} = shopContext;
 
   const totalAmount = getTotalCartAmount();
 
@@ -82,7 +79,7 @@ export const Cart = () => {
           if (cartItems[product.productId] === 0) {
             return null;
           }
-          return <CartItem data={product} />;
+          return <CartItem data={products} />;
         })}
       </div>
 

@@ -24,6 +24,7 @@ const connectToDatabase = async () => {
 };
 connectToDatabase();
 
+//登入-login                        
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   console.log("連接請求:", req.body);
@@ -59,7 +60,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-//生成帳號
+//生成帳號-createaccount
 app.post("/createaccount", async (req, res) => {
   const { username, password, nickname, phone, address } = req.body;
   console.log(req.body)
@@ -95,7 +96,7 @@ app.post("/createaccount", async (req, res) => {
   }
 });
 
-//取得用戶資料
+//取得用戶資料-user
 app.get("/user", async (req, res) => {
   const { userID } = req.query;
 
@@ -109,7 +110,7 @@ app.get("/user", async (req, res) => {
   }
 });
 
-//更新用戶
+//更新用戶-user
 app.put("/user", async (req, res) => {
   const { userID, nickname, phone, address } = req.body;
 
@@ -130,7 +131,7 @@ app.put("/user", async (req, res) => {
   }
 });
 
-//刪除用戶
+//刪除用戶-user
 app.delete("/user", async (req, res) => {
   const { userID } = req.query;
   console.log("Received userID for delete:", userID);
@@ -211,7 +212,7 @@ app.get("/orderhistory", async (req, res) => {
   }
 });
 
-//產品查詢
+//產品查詢-productlist
 app.get('/productlist', async (req, res) => {
   try {
 
@@ -246,6 +247,7 @@ const upload = multer({
 
 app.post('/productupload', upload.single('picture'), async (req, res) => {
   const { productname, price, detail, storage, userID, sort, status, picture } = req.body;
+
 
   console.log('Parsed values:', productname, price, detail, storage, userID, sort, status);
   console.log('Picture:', picture); // 输出上传的文件内容
