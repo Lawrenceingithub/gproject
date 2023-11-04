@@ -3,6 +3,7 @@ import Axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/auth-context";
 import { Sidebar } from "../../components/sidebar";
+import { v4 as uuidv4 } from 'uuid';
 
 export const ProductUpload = () => {
   const { userID } = useContext(AuthContext);
@@ -28,22 +29,19 @@ export const ProductUpload = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const binaryData = event.target.result;
-        setProductData({
-          ...productData,
-          picture: binaryData,
-        });
-      };
-      reader.readAsArrayBuffer(file);
+      setProductData({
+        ...productData,
+        picture: file,
+      });
     }
   };
 
-
   const handleUpload = async () => {
     try {
+      const productId = uuidv4(); // 使用 UUID 作为产品ID
+
       const formData = new FormData();
+      formData.append("productid", productId);
       formData.append("productname", productData.productname);
       formData.append("price", productData.price);
       formData.append("detail", productData.detail);
@@ -53,28 +51,26 @@ export const ProductUpload = () => {
       formData.append("userID", userID); // 附加 userID 到 formData
       formData.append("picture", productData.picture);
 
-        // 发送请求
-        Axios.post("http://localhost:3001/productupload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }).then((res) => {
-          console.log(res);
-          if (res.status === 200) {
-            // 上传成功
-            console.log("Product uploaded successfully");
-            alert("上傳成功");
-            navigate("/productupload");
-            console.log("FormData picture data:", formData.get("picture"));
-          } else {
-            console.error("Error uploading product. Response:", res);
-          }
-        });
+      // 发送请求
+      Axios.post("http://localhost:3001/productupload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }).then((res) => {
+        console.log(res);
+        if (res.status === 200) {
+          // 上传成功
+          console.log("Product uploaded successfully");
+          alert("上傳成功");
+          navigate("/productupload");
+        } else {
+          console.error("Error uploading product. Response:", res);
+        }
+      });
     } catch (error) {
       console.error("Error uploading product:", error);
     }
   };
-  
 
   return (
     <>

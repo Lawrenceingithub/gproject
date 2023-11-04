@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 app.use(cors());
 app.use(express.json());
 
+
 let db;
 const connectToDatabase = async () => {
   try {
@@ -15,7 +16,7 @@ const connectToDatabase = async () => {
       user: "root",
       host: "localhost",
       password: "QWEasd123",
-      database: "shopdb",
+      database: "employeesystem",
     });
     console.log("數據庫連接成功");
   } catch (error) {
@@ -166,7 +167,7 @@ app.post("/checkout", async (req, res) => {
     // 遍历购物车中的商品并插入订单商品表
     for (const itemID in cartItems) {
       const item = cartItems[itemID];
-      const product = PRODUCTS.find((product) => product.id === Number(itemID));
+      const product = products.find((product) => product.id === Number(itemID));
 
       if (product) {
         const product_price = product.price;
@@ -229,33 +230,38 @@ app.get('/productlist', async (req, res) => {
 
 //產品上傳
 const path = require('path');
-
-const uploadDirectory = path.join(__dirname, 'assets'); // 相对于服务器应用程序的根目录
+const fs = require('fs');
 const multer = require('multer');
+const uploadDirectory = path.join(__dirname, 'assets'); // 相对于服务器应用程序的根目录
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDirectory);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    // 构建新文件名，将产品ID作为文件名
+    const productId = req.body.productid;
+    const fileName = `${productId}${path.extname(file.originalname)}`;
+    cb(null, fileName);
   }
 });
+
 const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB限制
 });
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.post('/productupload', upload.single('picture'), async (req, res) => {
-  const { productname, price, detail, storage, userID, sort, status, picture } = req.body;
-
+  const { productname, price, detail, storage, userID, sort, status } = req.body;
+  const picture = req.file.filename; // 获取上传的文件名，这里已经是产品ID了
 
   console.log('Parsed values:', productname, price, detail, storage, userID, sort, status);
-  console.log('Picture:', picture); // 输出上传的文件内容
+  console.log('Picture:', picture); // 输出上传的文件名
 
   try {
-    const [result, fields] = await db.execute("INSERT INTO productsdb (productname, price, detail, sort, storage, status, picture, createdate, userID) VALUES (?, ?, ?, ?, ?, ?, ?, now(), ?)",
-    [productname, price, detail, sort, storage, status, picture , userID]);
-
+    const [result, fields] = await db.execute("INSERT INTO productsdb (productid, productname, price, detail, sort, storage, status, picture, createdate, userID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), ?)",
+    [req.body.productid, productname, price, detail, sort, storage, status, picture, userID]);
+    
     if (result.affectedRows > 0) {
       res.status(200).json({ message: 'Product uploaded successfully' });
     } else {

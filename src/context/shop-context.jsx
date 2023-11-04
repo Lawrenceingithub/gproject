@@ -17,27 +17,27 @@ export const ShopContextProvider = ({ children }) => {
   const [orderNotes, setOrderNotes] = useState(""); // 修正初始化
   const [products, setProducts] = useState([]);
 
-  const addToCart = (productId) => {
-    setCartItems((prev) => ({ ...prev, [productId]: prev[productId] + 1 }));
+  const addToCart = (productid) => {
+    setCartItems((prev) => ({ ...prev, [productid]: prev[productid] + 1 }));
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems((prev) => ({ ...prev, [productId]: prev[productId] - 1 }));
+  const removeFromCart = (productid) => {
+    setCartItems((prev) => ({ ...prev, [productid]: prev[productid] - 1 }));
   };
 
-  const updateCartItemCount = (newAmount, productId) => {
+  const updateCartItemCount = (newAmount, productid) => {
     if (newAmount < 0) {
       // 防止负数输入
       return;
     }
-    setCartItems((prev) => ({ ...prev, [productId]: newAmount }));
+    setCartItems((prev) => ({ ...prev, [productid]: newAmount }));
   };
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
-        let itemInfo = products.find((product) => product.productId === Number(item));
+        let itemInfo = products.find((product) => product.productid === Number(item));
         totalAmount += cartItems[item] * itemInfo.price;
       }
     }
