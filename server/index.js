@@ -2,12 +2,10 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql2/promise");
 const cors = require("cors");
-const bcrypt = require('bcrypt');
-
+const bcrypt = require("bcrypt");
 
 app.use(cors());
 app.use(express.json());
-
 
 let db;
 const connectToDatabase = async () => {
@@ -25,13 +23,16 @@ const connectToDatabase = async () => {
 };
 connectToDatabase();
 
-//登入-login                        
+//登入-login
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   console.log("連接請求:", req.body);
 
   try {
-    const [rows, fields] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username]);
+    const [rows, fields] = await db.execute(
+      "SELECT * FROM userdb WHERE username = ?",
+      [username]
+    );
     if (rows.length === 1) {
       const user = rows[0];
       const passwordMatch = await bcrypt.compare(password, user.password);
@@ -44,7 +45,7 @@ app.post("/login", async (req, res) => {
           nickname: user.nickname,
           phone: user.phone,
           address: user.address,
-          userrole: user.userrole // 确保包括 userrole
+          userrole: user.userrole, // 确保包括 userrole
         });
         console.log([user]);
       } else {
@@ -64,9 +65,12 @@ app.post("/login", async (req, res) => {
 //生成帳號-createaccount
 app.post("/createaccount", async (req, res) => {
   const { username, password, nickname, phone, address } = req.body;
-  console.log(req.body)
+  console.log(req.body);
   try {
-    const [existingUsers] = await db.execute("SELECT * FROM userdb WHERE username = ?", [username]);
+    const [existingUsers] = await db.execute(
+      "SELECT * FROM userdb WHERE username = ?",
+      [username]
+    );
 
     if (existingUsers.length > 0) {
       // 用户已存在
@@ -86,7 +90,10 @@ app.post("/createaccount", async (req, res) => {
     );
 
     // 注册成功后，返回用户ID
-    const [user] = await db.execute("SELECT userID FROM userdb WHERE username = ?", [username]);
+    const [user] = await db.execute(
+      "SELECT userID FROM userdb WHERE username = ?",
+      [username]
+    );
     const userID = user[0].userID;
 
     res.status(200).json({ userID, username, nickname, phone, address });
@@ -149,17 +156,29 @@ app.delete("/user", async (req, res) => {
 
 //创建订单
 app.post("/checkout", async (req, res) => {
-  const { userID, username, cartItems, orderNotes, deliveryMethod } = req.body; // 添加 orderNotes 和 deliveryMethod
-  console.log(orderNotes)
-  console.log(deliveryMethod)
-  let totalAmount = 0;
-  let orderID;
+  // 获取日期部分，例如 "20231105"
+  const currentDate = new Date().toISOString().slice(0, 10).replace(/-/g, "");
 
   try {
+    // 查询当天已经生成的订单数量
+    const [orderCountRow] = await db.execute(
+      "SELECT COUNT(*) as orderCount FROM orders WHERE createdate LIKE ?", // 查询当天的订单数量
+      [`${currentDate}%`]
+    );
+
+    const orderCount = orderCountRow[0].orderCount;
+    const orderNumber = `${currentDate}${orderCount
+      .toString()
+      .padStart(4, "0")}`;
+
+    const { userID, username, cartItems, orderNotes, deliveryMethod } =
+      req.body;
+    let totalAmount = 0;
+    let orderID;
 
     const [result] = await db.execute(
-      "INSERT INTO orders (userID, username, total_price, orderNotes, createdate, deliveryMethod) VALUES (?, ?, ?, ?, now(), ?)", // 更新 SQL 查询以包括配送方式
-      [userID, username, totalAmount, orderNotes, deliveryMethod] // 添加 orderNotes 和 deliveryMethod
+      "INSERT INTO orders (userID, username, total_price, deliveryMethod, orderNotes, createdate) VALUES (?, ?, ?, ?, ?, now())", // 更新 SQL 查询以包括配送方式
+      [userID, username, totalAmount, deliveryMethod, orderNotes] // 添加 orderNotes 和 deliveryMethod
     );
     // 获取生成的订单ID
     orderID = result.insertId;
@@ -186,10 +205,10 @@ app.post("/checkout", async (req, res) => {
     }
 
     // 更新订单总价格
-    await db.execute(
-      "UPDATE orders SET total_price = ? WHERE orderID = ?",
-      [totalAmount, orderID]
-    );
+    await db.execute("UPDATE orders SET total_price = ? WHERE orderID = ?", [
+      totalAmount,
+      orderID,
+    ]);
 
     res.status(200).json({ orderID, totalAmount });
   } catch (error) {
@@ -198,11 +217,9 @@ app.post("/checkout", async (req, res) => {
   }
 });
 
-
 // 查询订单数据
 app.get("/orderhistory", async (req, res) => {
   try {
-
     const [rows, fields] = await db.execute("SELECT * FROM orders");
 
     // 将订单数据发送到前端
@@ -214,9 +231,8 @@ app.get("/orderhistory", async (req, res) => {
 });
 
 //產品查詢-productlist
-app.get('/productlist', async (req, res) => {
+app.get("/productlist", async (req, res) => {
   try {
-
     const [rows, fields] = await db.execute("SELECT * FROM productsdb");
 
     // 将订单数据发送到前端
@@ -227,12 +243,10 @@ app.get('/productlist', async (req, res) => {
   }
 });
 
-
 //產品上傳
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
-const uploadDirectory = path.join(__dirname, 'assets'); // 相对于服务器应用程序的根目录
+const path = require("path");
+const multer = require("multer");
+const uploadDirectory = path.join(__dirname, "assets"); // 相对于服务器应用程序的根目录
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDirectory);
@@ -242,39 +256,61 @@ const storage = multer.diskStorage({
     const productId = req.body.productid;
     const fileName = `${productId}${path.extname(file.originalname)}`;
     cb(null, fileName);
-  }
+  },
 });
 
 const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB限制
 });
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use("/assets", express.static(path.join(__dirname, "assets")));
 
-app.post('/productupload', upload.single('picture'), async (req, res) => {
-  const { productname, price, detail, storage, userID, sort, status } = req.body;
+app.post("/productupload", upload.single("picture"), async (req, res) => {
+  const { productname, price, detail, storage, userID, sort, status } =
+    req.body;
   const picture = req.file.filename; // 获取上传的文件名，这里已经是产品ID了
 
-  console.log('Parsed values:', productname, price, detail, storage, userID, sort, status);
-  console.log('Picture:', picture); // 输出上传的文件名
+  console.log(
+    "Parsed values:",
+    productname,
+    price,
+    detail,
+    storage,
+    userID,
+    sort,
+    status
+  );
+  console.log("Picture:", picture); // 输出上传的文件名
 
   try {
-    const [result, fields] = await db.execute("INSERT INTO productsdb (productid, productname, price, detail, sort, storage, status, picture, createdate, userID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), ?)",
-    [req.body.productid, productname, price, detail, sort, storage, status, picture, userID]);
-    
+    const [result, fields] = await db.execute(
+      "INSERT INTO productsdb (productid, productname, price, detail, sort, storage, status, picture, createdate, userID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), ?)",
+      [
+        req.body.productid,
+        productname,
+        price,
+        detail,
+        sort,
+        storage,
+        status,
+        picture,
+        userID,
+      ]
+    );
+
     if (result.affectedRows > 0) {
-      res.status(200).json({ message: 'Product uploaded successfully' });
+      res.status(200).json({ message: "Product uploaded successfully" });
     } else {
-      console.error('Error inserting product into the database');
-      res.status(500).json({ error: 'Error inserting product into the database' });
+      console.error("Error inserting product into the database");
+      res
+        .status(500)
+        .json({ error: "Error inserting product into the database" });
     }
-    
   } catch (error) {
-    console.error('Error uploading product:', error);
-    res.status(500).send('Error uploading product');
+    console.error("Error uploading product:", error);
+    res.status(500).send("Error uploading product");
   }
 });
-
 
 app.listen(3001, () => {
   console.log("Server is running");

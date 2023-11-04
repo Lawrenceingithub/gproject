@@ -1,28 +1,29 @@
 import React, { useContext } from "react";
 import { ShopContext } from "../../context/shop-context";
 
-export const CartItem = () => {
-  const { cartItems, addToCart, removeFromCart, updateCartItemCount, products } =
+export const CartItem = (prop) => {
+  const { productid, productname, price, picture, detail} = prop.data;
+  const { cartItems, handleAddToCart, handleRemoveFromCart, handleUpdateCartItemCount, products } =
     useContext(ShopContext);
 
   return (
     <div className="cartItem">
-      <img src={products.picutre} alt={products.picutre}/>
+      <img src={`http://localhost:3001/assets/${picture}`} alt={products.picutre}/>
       <div className="description">
         <>
         <p>
-          <b>名稱: {products.productname}</b><br/>
-          <b>詳情: {products.detail}</b>
+          <b>名稱: {productname}</b><br/>
+          <b>詳情: {detail}</b>
         </p>
         </>
-        <p> 價值: ${products.price}</p>
+        <p> 價值: ${price}</p>
         <div className="countHandler">
-          <button onClick={() => removeFromCart(products.productid)}> - </button>
+          <button onClick={() => handleRemoveFromCart(productid)}> - </button>
           <input
-            value={cartItems[products.productid]}
-            onChange={(e) => updateCartItemCount(Number(e.target.value), products.productid)}
+            value={cartItems[productid]}
+            onChange={(e) => handleUpdateCartItemCount(Number(e.target.value), productid)}
           />
-          <button onClick={() => addToCart(products.productid)}> + </button>
+          <button onClick={() => handleAddToCart(productid)}> + </button>
         </div>
       </div>
     </div>

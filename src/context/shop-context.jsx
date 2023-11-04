@@ -16,68 +16,80 @@ export const ShopContextProvider = ({ children }) => {
   const [deliveryMethod, setDeliveryMethod] = useState("1");
   const [orderNotes, setOrderNotes] = useState(""); // 修正初始化
   const [products, setProducts] = useState([]);
-
-  const addToCart = (productid) => {
-    setCartItems((prev) => ({ ...prev, [productid]: prev[productid] + 1 }));
-  };
-
-  const removeFromCart = (productid) => {
-    setCartItems((prev) => ({ ...prev, [productid]: prev[productid] - 1 }));
-  };
-
-  const updateCartItemCount = (newAmount, productid) => {
-    if (newAmount < 0) {
-      // 防止负数输入
-      return;
-    }
-    setCartItems((prev) => ({ ...prev, [productid]: newAmount }));
-  };
-
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        let itemInfo = products.find((product) => product.productid === Number(item));
-        totalAmount += cartItems[item] * itemInfo.price;
-      }
-    }
-    return totalAmount;
-  };
-
-  const checkout = () => {
-    setCartItems(getDefaultCart());
-    
-  };
+  const [orderTotal, setOrderTotal] = useState(0);
 
   useEffect(() => {
-    // 在组件加载时，从LocalStorage加载购物车数据
     const storedCart = localStorage.getItem("cartItems");
     if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
+      const parsedCart = JSON.parse(storedCart);
+      for (const key in parsedCart) {
+        parsedCart[key] = parsedCart[key] === null ? 0 : parsedCart[key];
+      }
+      setCartItems(parsedCart);
     } else {
-      // 如果 localStorage 中没有购物车数据，设置一个默认的空购物车
       setCartItems(getDefaultCart());
     }
   }, []);
 
+  // 在 cartItems 变化时更新 localStorage
   useEffect(() => {
-    // 每当购物车数据更改时，保存到LocalStorage
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  const handleAddToCart = (productid) => {
+    const updatedAmount = parseInt(cartItems[productid] || 0, 10) + 1;
+    setCartItems((prev) => ({
+      ...prev,
+      [productid]: updatedAmount,
+    }));
+  };
+  
+  const handleRemoveFromCart = (productid) => {
+    const updatedAmount = cartItems[productid] === null ? 0 : cartItems[productid] - 1;
+    handleUpdateCartItemCount(updatedAmount, productid);
+  };
+
+  const handleUpdateCartItemCount = (newAmount, productid) => {
+    const updatedAmount = newAmount === null ? 0 : newAmount;
+    setCartItems((prev) => ({
+      ...prev,
+      [productid]: updatedAmount,
+    }));
+  };
+
+  function getTotalCartAmount() {
+    let totalAmount = 0;
+
+    if (cartItems) {
+      Object.keys(cartItems).forEach((productid) => {
+        const product = products.find((product) => product.productid === productid);
+        if (product && cartItems[productid] > 0) {
+          totalAmount += product.price * cartItems[productid];
+        }
+        setOrderTotal(totalAmount);
+      });
+    }
+    return totalAmount;
+  }
+  
+  const checkout = () => {
+    setCartItems(getDefaultCart());
+  };
+
   const contextValue = {
     cartItems,
-    addToCart,
-    updateCartItemCount,
-    removeFromCart,
+    handleAddToCart,
+    handleUpdateCartItemCount,
+    handleRemoveFromCart,
     getTotalCartAmount,
     checkout,
     deliveryMethod,
-    orderNotes,
-    setDeliveryMethod, // 新增设置 deliveryMethod 的函数
-    setOrderNotes, // 新增设置 orderNotes 的函数
+    orderNotes,  // 添加 orderNotes 到 contextValue
+    setDeliveryMethod,
+    setOrderNotes,  // 添加 setOrderNotes 到 contextValue
     products,
-    setProducts
+    setProducts,
+    orderTotal,  // 添加 orderTotal 到 contextValue
   };
 
   return (
@@ -86,4 +98,3 @@ export const ShopContextProvider = ({ children }) => {
     </ShopContext.Provider>
   );
 };
-

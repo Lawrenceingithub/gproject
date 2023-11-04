@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ShopContext } from '../../context/shop-context';
 import { AuthContext } from '../../context/auth-context';
 import './checkout.css';
@@ -6,9 +7,17 @@ import './checkout.css';
 export const Checkout = () => {
   const { username, address, phone } = useContext(AuthContext);
   const { deliveryMethod, orderNotes, cartItems } = useContext(ShopContext);
-  const [orderNumber, setOrderNumber] = useState('');
-  const [orderTotal, setOrderTotal] = useState(0);
+  const [ orderNumber, setOrderNumber] = useState(''); // 设置订单号码
+  const [ orderTotal, setOrderTotal ] = useState(0); // 设置订单总金额
 
+  const location = useLocation(); // 获取当前位置
+
+  // 计算订单总金额
+  useEffect(() => {
+    if (location.state && location.state.orderNumber) {
+      setOrderNumber(location.state.orderNumber);
+    }
+  }, [location.state]);
 
   return (
     <div className="checkoutcontent">
