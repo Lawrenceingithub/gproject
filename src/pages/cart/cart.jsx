@@ -1,62 +1,63 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { ShopContext } from "../../context/shop-context";
 import { CartItem } from "./cart-item";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Axios from "axios";
-import "./cart.css";
-
-import { getDefaultCart } from "../../context/shop-context";
 import { AuthContext } from "../../context/auth-context";
+import "./cart.css";
 
 export const Cart = () => {
   const authContext = useContext(AuthContext);
-  const { isLoggedIn, userID, username, address, orderTotal } = authContext;
+  const { isLoggedIn, userID, username, address } = authContext;
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const shopContext = useContext(ShopContext);
   const {
+    orderNumber,
     orderNotes,
     deliveryMethod,
-    getTotalCartAmount,
+    products,
+    totalAmount, 
     setOrderNotes,
     setDeliveryMethod,
-    products,
+    settotalAmount,
+    setOrderNumber,
+    cartItems,
   } = shopContext;
 
-  const totalAmount = getTotalCartAmount();
-
-  const [cartItems, setCartItems] = useState(() => {
-    const storedCart = localStorage.getItem("cartItems");
-    return storedCart ? JSON.parse(storedCart) : getDefaultCart();
-  });
-
   useEffect(() => {
-    // 当 cartItems 发生变化时，保存到 localStorage
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (location.state && location.state.orderNumber) {
+      setOrderNumber(location.state.orderNumber);
+      setOrderNotes(location.state.orderNotes);
+      settotalAmount(location.state.totalAmount);
+    }
+  }, [location.state, setOrderNotes, setOrderNumber, settotalAmount]);
 
   const handleDeliveryMethod = (e) => {
     const selectedDeliveryMethod = e.target.value;
-    setDeliveryMethod(selectedDeliveryMethod); // 使用 setDeliveryMethod 函数来更新值
+    setDeliveryMethod(selectedDeliveryMethod);
   };
 
-  // 过滤购物车中有数量的产品
   const cartProducts = products.filter(
     (product) => cartItems[product.productid] > 0
   );
 
-  // 当用户点击结算时，将购物车信息传递给checkout函数
   const handleCheckout = async () => {
     if (isLoggedIn) {
       try {
-        const cartItemsWithDetails = []; // 存储购物车商品的详细信息
-  
-        // 遍历购物车中的商品，获取商品详细信息并添加到 cartItemsWithDetails 数组
+        const cartItemsWithDetails = [];
         for (const itemID in cartItems) {
           const item = cartItems[itemID];
+          console.log(item)
           if (item.quantity > 0) {
-            const product = products.find((product) => product.productid === Number(itemID));
+            console.log(item.quantity)
+            const product = products.find(
+              (product) => product.productid === Number(itemID)
+            );
             if (product) {
+              console.log("product存在?", product)
               cartItemsWithDetails.push({
                 productid: itemID,
                 price: product.price,
@@ -65,34 +66,46 @@ export const Cart = () => {
             }
           }
         }
-  
+
         const orderData = {
+          orderNumber: orderNumber,
           userID: userID,
           username: username,
-          cartItems: cartItemsWithDetails, // 包括购物车商品的详细信息
+          cartItems: cartItemsWithDetails,
           orderNotes: orderNotes,
           deliveryMethod: deliveryMethod,
+          totalAmount: totalAmount
         };
-  
-        // 发送包括商品详细信息的订单数据到服务器端
-        const response = await Axios.post("http://localhost:3001/checkout", orderData, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-  
+
+        console.log("orderData的值", orderData)
+
+        const response = await Axios.post(
+          "http://localhost:3001/checkout",
+          orderData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
         if (response.status === 200) {
-          // 处理订单生成成功的情况
           const responseData = response.data;
-          const orderNumber = responseData.orderID;
-          setOrderNotes(""); // 清空 orderNotes
-          navigate("/checkout", { state: { orderNumber, orderNotes, orderTotal } });
+          const orderNumber = responseData.orderNumber;
+          const orderNotes = responseData.orderNotes;
+          const totalAmount = responseData.totalAmount;
+
+          setTimeout(() => {
+            alert("成功下單");
+            navigate("/checkout", {
+              state: { orderNumber, orderNotes, totalAmount },
+            });
+          }, 500);
         } else {
           console.error("Failed to submit the order");
         }
       } catch (error) {
         console.error("Error during checkout:", error);
-        // 处理错误，如果有必要
       }
     } else {
       navigate("/login");
@@ -107,7 +120,7 @@ export const Cart = () => {
       <div className="cartdetail">
         {cartProducts.map((product) => {
           if (cartItems[product.productid] === 0) {
-            return null; // 如果产品的数量为0，则不渲染
+            return null;
           }
           return <CartItem key={product.productid} data={product} />;
         })}

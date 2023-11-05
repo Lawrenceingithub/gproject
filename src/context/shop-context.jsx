@@ -15,38 +15,70 @@ export const ShopContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
   const [deliveryMethod, setDeliveryMethod] = useState("1");
   const [orderNotes, setOrderNotes] = useState(""); // 修正初始化
+  const [orderNumber, setOrderNumber] = useState(""); // 修正初始化
   const [products, setProducts] = useState([]);
-  const [orderTotal, setOrderTotal] = useState(0);
+  const [totalAmount, settotalAmount] = useState(() => {
+    const storedTotalAmount = localStorage.getItem("totalAmount");
+    return storedTotalAmount ? parseFloat(storedTotalAmount) : 0;
+  });
+
+  useEffect(() => {
+    if (cartItems && products.length > 0) {
+      let totalAmount = 0;
+  
+  
+      Object.keys(cartItems).forEach((productid) => {
+        
+        const productIdNumber = productid;
+        const product = products.find((product) => product.productid === productIdNumber);
+        
+        if (product && cartItems[productid] > 0) {
+          totalAmount += product.price * cartItems[productid];
+        }
+      });
+  
+      settotalAmount(totalAmount);
+      localStorage.setItem("totalAmount", totalAmount.toString());
+    }
+  }, [cartItems, products, settotalAmount]);
 
   useEffect(() => {
     const storedCart = localStorage.getItem("cartItems");
+    console.log("Stored cart data:", storedCart);
     if (storedCart) {
       const parsedCart = JSON.parse(storedCart);
+      const sanitizedCart = {};
       for (const key in parsedCart) {
-        parsedCart[key] = parsedCart[key] === null ? 0 : parsedCart[key];
+        sanitizedCart[key] = parseInt(parsedCart[key], 10) || 0;
       }
-      setCartItems(parsedCart);
+      setCartItems(sanitizedCart);
     } else {
       setCartItems(getDefaultCart());
     }
-  }, []);
+  }, []); // 使用空的依赖项数组
 
   // 在 cartItems 变化时更新 localStorage
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
+
   const handleAddToCart = (productid) => {
+    // 更新购物车中商品数量的逻辑
     const updatedAmount = parseInt(cartItems[productid] || 0, 10) + 1;
     setCartItems((prev) => ({
       ...prev,
       [productid]: updatedAmount,
     }));
   };
-  
+
   const handleRemoveFromCart = (productid) => {
+    // 更新购物车中商品数量的逻辑
     const updatedAmount = cartItems[productid] === null ? 0 : cartItems[productid] - 1;
-    handleUpdateCartItemCount(updatedAmount, productid);
+    setCartItems((prev) => ({
+      ...prev,
+      [productid]: updatedAmount,
+    }));
   };
 
   const handleUpdateCartItemCount = (newAmount, productid) => {
@@ -57,39 +89,22 @@ export const ShopContextProvider = ({ children }) => {
     }));
   };
 
-  function getTotalCartAmount() {
-    let totalAmount = 0;
-
-    if (cartItems) {
-      Object.keys(cartItems).forEach((productid) => {
-        const product = products.find((product) => product.productid === productid);
-        if (product && cartItems[productid] > 0) {
-          totalAmount += product.price * cartItems[productid];
-        }
-        setOrderTotal(totalAmount);
-      });
-    }
-    return totalAmount;
-  }
-  
-  const checkout = () => {
-    setCartItems(getDefaultCart());
-  };
 
   const contextValue = {
     cartItems,
     handleAddToCart,
     handleUpdateCartItemCount,
     handleRemoveFromCart,
-    getTotalCartAmount,
-    checkout,
     deliveryMethod,
-    orderNotes,  // 添加 orderNotes 到 contextValue
-    setDeliveryMethod,
-    setOrderNotes,  // 添加 setOrderNotes 到 contextValue
+    orderNotes,
+    orderNumber, // 将 orderNumber 包括在 contextValue
     products,
+    totalAmount,
+    setDeliveryMethod,
+    setOrderNotes,
+    setOrderNumber, // 设置 setOrderNumber 函数
     setProducts,
-    orderTotal,  // 添加 orderTotal 到 contextValue
+    settotalAmount,
   };
 
   return (

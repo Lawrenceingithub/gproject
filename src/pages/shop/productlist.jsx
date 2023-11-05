@@ -8,32 +8,20 @@ export const Productlist = () => {
   const { handleAddToCart, cartItems, products, setProducts } =
     useContext(ShopContext);
 
-  useEffect(() => {
-    // 在组件加载时获取产品数据
-    Axios.get("http://localhost:3001/productlist")
-      .then((response) => {
-        setProducts(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching products:", error);
-      });
-  }, [setProducts]);
+    useEffect(() => {
+      Axios.get("http://localhost:3001/productlist")
+        .then((response) => {
+          setProducts(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error);
+        });
+    }, [setProducts]);
 
   const handleAddToCartClick = (productid) => {
-    // 获取之前存储在 localStorage 中的购物车数据
-    const storedCart = JSON.parse(localStorage.getItem("cartItems")) || {};
-  
-    // 找到要添加到购物车的产品
-    const productToAdd = products.find((product) => product.productid === productid);
-  
-    if (productToAdd) {
-      // 将产品添加到购物车中
-      storedCart[productid] = (storedCart[productid] || 0) + 1;
-      localStorage.setItem("cartItems", JSON.stringify(storedCart));
-  
-      // 更新 React 组件中的购物车状态
+   
       handleAddToCart(productid);
-    }
+
   };
   
   

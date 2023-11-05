@@ -23,26 +23,12 @@ export const ProductDetail = () => {
 
   const handleAddToCartClick = () => {
     handleAddToCart(productDetail.productid);
-    
   };
 
   const handleRemoveFromCartClick = (productid) => {
     // 更新 React 组件中的购物车状态
     handleRemoveFromCart(productid);
-  
-    // 获取之前存储在 localStorage 中的购物车数据
-    const storedCart = JSON.parse(localStorage.getItem("cartItems")) || {};
-  
-    // 找到要从购物车中移除的产品
-    const productToRemove = products.find((product) => product.productid === productid);
-  
-    if (productToRemove) {
-      // 减少产品在购物车中的数量
-      if (storedCart[productid] > 0) {
-        storedCart[productid] -= 1;
-        localStorage.setItem("cartItems", JSON.stringify(storedCart));
-      }
-    }
+
   };
   
 
