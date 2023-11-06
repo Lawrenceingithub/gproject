@@ -9,12 +9,13 @@ export const Checkout = () => {
   const {
     deliveryMethod,
     orderNotes,
-    cartItems,
     totalAmount,
     orderNumber,
+    productDetails,
     setOrderNotes,
     setOrderNumber,
     settotalAmount,
+    setProductDetails
   } = useContext(ShopContext);
 
   const location = useLocation();
@@ -25,17 +26,19 @@ export const Checkout = () => {
       setOrderNumber(location.state.orderNumber);
       setOrderNotes(location.state.orderNotes);
       settotalAmount(location.state.totalAmount);
+      setProductDetails(location.state.productDetails); // 提取并分配 productDetails
     }
-  }, [location.state, setOrderNotes, setOrderNumber, settotalAmount]);
+  }, [location.state, setOrderNotes, setOrderNumber, settotalAmount, setProductDetails]);
+  
 
   return (
     <div className="checkoutcontent">
       <h1>订单详情：</h1>
-
+  
       <p>订单号码: {orderNumber}</p>
       <p>用户名：{username}</p>
       <p>电话：{phone}</p>
-
+  
       <p>
         配送方式:{" "}
         {deliveryMethod === "1"
@@ -44,27 +47,16 @@ export const Checkout = () => {
           ? "自取：地點1"
           : "自取：地點2"}
       </p>
-
+  
       {/* 订单备注 */}
       <p>备注：{orderNotes}</p>
-
+  
       {/* 总金额 */}
       <p>总计: ${totalAmount}</p>
-
-      {/* 渲染每个商品 */}
-      {Object.keys(cartItems).map((itemId) => {
-        const item = cartItems[itemId];
-        if (item.quantity > 0) {
-          return (
-            <div key={itemId}>
-              <p>{item.name}</p>
-              <p>价格：${item.price}</p>
-              <p>数量：{item.quantity}</p>
-            </div>
-          );
-        }
-        return null;
-      })}
+  
+      {/* 添加产品信息 */}
+      <p>产品詳情: {productDetails}</p>
+  
       <button
         onClick={() => {
           navigate("/");
@@ -75,4 +67,5 @@ export const Checkout = () => {
       </button>
     </div>
   );
+  
 };

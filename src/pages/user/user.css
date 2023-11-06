@@ -9,6 +9,15 @@
   border: 2px solid rgb(0, 0, 0); /* 调整为适当的边框宽度 */
 }
 
+.maincontent2 {
+  position: relative;
+  flex: 100%;
+  margin-left: 160px;
+  margin-top: 90px;
+  border-radius: 5px;
+  border: 2px solid rgb(0, 0, 0); /* 调整为适当的边框宽度 */
+}
+
 .user {
   margin-left: 10px; /* 调整为适当的内边距 */ 
   margin-bottom: 10px;

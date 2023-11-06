@@ -20,10 +20,12 @@ export const Cart = () => {
     deliveryMethod,
     products,
     totalAmount, 
+    productDetails,
     setOrderNotes,
     setDeliveryMethod,
-    settotalAmount,
+    setTotalAmount,
     setOrderNumber,
+    setProductDetails,
     cartItems,
   } = shopContext;
 
@@ -31,11 +33,12 @@ export const Cart = () => {
     if (location.state && location.state.orderNumber) {
       setOrderNumber(location.state.orderNumber);
       setOrderNotes(location.state.orderNotes);
-      settotalAmount(location.state.totalAmount);
+      setTotalAmount(location.state.totalAmount);
+      setProductDetails (location.state.productDetails)
     }
-  }, [location.state, setOrderNotes, setOrderNumber, settotalAmount]);
+  }, [location.state, setOrderNotes, setOrderNumber, setTotalAmount, productDetails]);
 
-  const handleDeliveryMethod = (e) => {
+  const handleDeliveryMethodChange = (e) => {
     const selectedDeliveryMethod = e.target.value;
     setDeliveryMethod(selectedDeliveryMethod);
   };
@@ -46,39 +49,21 @@ export const Cart = () => {
 
   const handleCheckout = async () => {
     if (isLoggedIn) {
-      try {
-        const cartItemsWithDetails = [];
-        for (const itemID in cartItems) {
-          const item = cartItems[itemID];
-          console.log(item)
-          if (item.quantity > 0) {
-            console.log(item.quantity)
-            const product = products.find(
-              (product) => product.productid === Number(itemID)
-            );
-            if (product) {
-              console.log("product存在?", product)
-              cartItemsWithDetails.push({
-                productid: itemID,
-                price: product.price,
-                quantity: item.quantity,
-              });
-            }
-          }
-        }
-
+      try{
+        // 确保使用来自 ShopContext 的 productDetails
         const orderData = {
           orderNumber: orderNumber,
           userID: userID,
           username: username,
-          cartItems: cartItemsWithDetails,
           orderNotes: orderNotes,
           deliveryMethod: deliveryMethod,
-          totalAmount: totalAmount
+          totalAmount: totalAmount,
+          productDetails: productDetails, // 将产品信息字符串添加到订单数据
         };
-
-        console.log("orderData的值", orderData)
-
+  
+        console.log("orderData的值", orderData);
+        console.log("productDetails的值", productDetails);
+  
         const response = await Axios.post(
           "http://localhost:3001/checkout",
           orderData,
@@ -88,17 +73,23 @@ export const Cart = () => {
             },
           }
         );
-
+  
         if (response.status === 200) {
           const responseData = response.data;
           const orderNumber = responseData.orderNumber;
           const orderNotes = responseData.orderNotes;
           const totalAmount = responseData.totalAmount;
-
+          const productDetails = responseData.productDetails;
+  
           setTimeout(() => {
             alert("成功下單");
             navigate("/checkout", {
-              state: { orderNumber, orderNotes, totalAmount },
+              state: {
+                orderNumber,
+                orderNotes,
+                totalAmount,
+                productDetails, // 将 productDetails 包括在 location.state 中
+              },
             });
           }, 500);
         } else {
@@ -111,6 +102,7 @@ export const Cart = () => {
       navigate("/login");
     }
   };
+  
 
   return (
     <div className="cart">
@@ -130,7 +122,7 @@ export const Cart = () => {
         <div className="checkout">
           <div>
             <h1>配送方式：</h1>
-            <select onChange={handleDeliveryMethod}>
+            <select onChange={handleDeliveryMethodChange}>
               <option value="1">送貨：{address}</option>
               <option value="2">自取：地點1</option>
               <option value="3">自取：地點2</option>

@@ -7,18 +7,7 @@ import { Sidebar } from "../../components/sidebar";
 
 export const User = () => {
   const authContext = useContext(AuthContext);
-  const {
-    isLoggedIn,
-    logout,
-    userID,
-    nickname,
-    phone,
-    address,
-    setNickname,
-    setPhone,
-    setAddress,
-    userrole,
-  } = authContext;
+  const { logout, userID, setNickname, setPhone, setAddress } = authContext;
 
   const [userlist, setUserlist] = useState([]);
   const [editedNickname, setEditedNickname] = useState("");
@@ -45,8 +34,6 @@ export const User = () => {
   };
 
   const handleEdit = async () => {
-    console.log("Editing user with userID:", userID);
-
     try {
       const response = await axios.get(
         `http://localhost:3001/user?userID=${userID}`
@@ -64,8 +51,6 @@ export const User = () => {
   };
 
   const handleSave = async (id) => {
-    console.log("Saving user with userID:", id);
-
     try {
       const updatedUser = {
         userID: id,
@@ -92,12 +77,9 @@ export const User = () => {
 
   const handleCancelEdit = () => {
     setIsEditing(false);
-    console.log("Cancel editing");
   };
 
   const handleDelete = async (id) => {
-    console.log("Deleting user with userID:", id);
-
     try {
       await axios.delete(`http://localhost:3001/user?userID=${id}`);
 

@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { Productlist } from "../pages/shop/productlist";
 
 export const ShopContext = createContext();
@@ -14,37 +14,17 @@ export const getDefaultCart = () => {
 export const ShopContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
   const [deliveryMethod, setDeliveryMethod] = useState("1");
-  const [orderNotes, setOrderNotes] = useState(""); // 修正初始化
-  const [orderNumber, setOrderNumber] = useState(""); // 修正初始化
+  const [orderNotes, setOrderNotes] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
   const [products, setProducts] = useState([]);
+  const [productDetails, setProductDetails] = useState(""); // 添加 productDetails
   const [totalAmount, settotalAmount] = useState(() => {
     const storedTotalAmount = localStorage.getItem("totalAmount");
     return storedTotalAmount ? parseFloat(storedTotalAmount) : 0;
   });
 
   useEffect(() => {
-    if (cartItems && products.length > 0) {
-      let totalAmount = 0;
-  
-  
-      Object.keys(cartItems).forEach((productid) => {
-        
-        const productIdNumber = productid;
-        const product = products.find((product) => product.productid === productIdNumber);
-        
-        if (product && cartItems[productid] > 0) {
-          totalAmount += product.price * cartItems[productid];
-        }
-      });
-  
-      settotalAmount(totalAmount);
-      localStorage.setItem("totalAmount", totalAmount.toString());
-    }
-  }, [cartItems, products, settotalAmount]);
-
-  useEffect(() => {
     const storedCart = localStorage.getItem("cartItems");
-    console.log("Stored cart data:", storedCart);
     if (storedCart) {
       const parsedCart = JSON.parse(storedCart);
       const sanitizedCart = {};
@@ -62,6 +42,35 @@ export const ShopContextProvider = ({ children }) => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // 计算 totalAmount 和 productDetails 的 useEffect 放在这里
+  useEffect(() => {
+    if (cartItems && products.length > 0) {
+      let totalAmount = 0;
+      let updatedProductDetails = ""; // 添加一个变量来保存更新的 productDetails
+  
+      Object.keys(cartItems).forEach((productid) => {
+        const productIdNumber = productid;
+        const product = products.find(
+          (product) => product.productid === productIdNumber
+        );
+  
+        if (product && cartItems[productid] > 0) {
+          totalAmount += product.price * cartItems[productid];
+          updatedProductDetails += `${product.productname} ${cartItems[productid]}件 `; // 更新 productDetails
+        }
+      });
+  
+      settotalAmount(totalAmount);
+      setProductDetails(updatedProductDetails); // 更新 productDetails
+      localStorage.setItem("totalAmount", totalAmount.toString());
+      localStorage.setItem("productDetails", updatedProductDetails); // 也保存到本地存储
+    }
+  }, [cartItems, products, settotalAmount, setProductDetails]);
+
+  // 处理添加产品信息的函数
+  const handleAddProductDetails = (details) => {
+    setProductDetails(details);
+  };
 
   const handleAddToCart = (productid) => {
     // 更新购物车中商品数量的逻辑
@@ -89,7 +98,6 @@ export const ShopContextProvider = ({ children }) => {
     }));
   };
 
-
   const contextValue = {
     cartItems,
     handleAddToCart,
@@ -100,11 +108,14 @@ export const ShopContextProvider = ({ children }) => {
     orderNumber, // 将 orderNumber 包括在 contextValue
     products,
     totalAmount,
+    productDetails,
     setDeliveryMethod,
     setOrderNotes,
     setOrderNumber, // 设置 setOrderNumber 函数
     setProducts,
     settotalAmount,
+    setProductDetails,
+    handleAddProductDetails, // 将 handleAddProductDetails 包括在 contextValue
   };
 
   return (
