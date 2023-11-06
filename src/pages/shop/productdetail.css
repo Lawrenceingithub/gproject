@@ -1,0 +1,29 @@
+.ProductDetailInfo{
+    margin-top: 80px;
+}
+
+.ProductDetail {
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+.countHandler{
+    color: white;
+    border: none;
+    margin-bottom: 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    padding-right: 5px ;
+  }
+  
+.button{
+    margin: 5px;
+    display: flex;
+  }
+
+.ProductDetail img {
+  width: 280px;
+}

@@ -1,0 +1,19 @@
+.checkoutcontent {
+  position: relative;
+  flex: 50%;
+
+  margin-top: 90px;
+  border-radius: 5px;
+  border: 2px solid rgb(0, 0, 0); /* 调整为适当的边框宽度 */
+}
+
+.checkoutcontentdetail {
+  margin-left: 10px; /* 调整为适当的内边距 */
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.checkoutcontentdetail button {
+  width: 150px;
+}
