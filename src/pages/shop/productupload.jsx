@@ -77,7 +77,7 @@ export const ProductUpload = () => {
       <Sidebar />
       <div className="maincontent">
         <h2>产品上传</h2>
-        <form encType="multipart/form-data">
+        <form encType="multipart/form-data" className="productuploaddetail">
           <div>
             <label>产品名称: </label>
             <input
@@ -138,11 +138,12 @@ export const ProductUpload = () => {
           <div>
             <input type="file" name="picture" onChange={handleFileChange} />
           </div>
-          <div>
+          <div className="productdetail-button">
             <button onClick={handleUpload}>上传产品</button>
+            <button onClick={() => navigate("/user")}>返回</button>
           </div>
         </form>
-        <button onClick={() => navigate("/user")}>返回</button>
+
       </div>
     </>
   );

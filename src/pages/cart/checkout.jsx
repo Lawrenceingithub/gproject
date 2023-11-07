@@ -68,6 +68,7 @@ export const Checkout = () => {
             onClick={() => {
               navigate("/");
               setOrderNotes("");
+              
             }}
           >
             返回首頁

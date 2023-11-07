@@ -37,3 +37,29 @@
   flex: 100%;
   border: 2px solid rgb(0, 0, 0); /* 调整为适当的边框宽度 */
 }
+
+
+.productuploaddetail{
+  margin-left: 10px; /* 调整为适当的内边距 */ 
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.productuploaddetail div{
+
+  margin-bottom: 10px;
+
+}
+
+.productdetail-button button {
+  background-color: rgb(45, 197, 83);
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  margin: 10px;
+}
+

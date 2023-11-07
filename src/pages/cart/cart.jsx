@@ -20,7 +20,7 @@ export const Cart = () => {
     orderNotes,
     deliveryMethod,
     products,
-    totalAmount, 
+    totalAmount,
     productDetails,
     setOrderNotes,
     setDeliveryMethod,
@@ -35,9 +35,15 @@ export const Cart = () => {
       setOrderNumber(location.state.orderNumber);
       setOrderNotes(location.state.orderNotes);
       setTotalAmount(location.state.totalAmount);
-      setProductDetails (location.state.productDetails)
+      setProductDetails(location.state.productDetails);
     }
-  }, [location.state, setOrderNotes, setOrderNumber, setTotalAmount, productDetails]);
+  }, [
+    location.state,
+    setOrderNotes,
+    setOrderNumber,
+    setTotalAmount,
+    productDetails,
+  ]);
 
   const handleDeliveryMethodChange = (e) => {
     const selectedDeliveryMethod = e.target.value;
@@ -50,7 +56,7 @@ export const Cart = () => {
 
   const handleCheckout = async () => {
     if (isLoggedIn) {
-      try{
+      try {
         // 确保使用来自 ShopContext 的 productDetails
         const orderData = {
           orderNumber: orderNumber,
@@ -61,7 +67,7 @@ export const Cart = () => {
           totalAmount: totalAmount,
           productDetails: productDetails, // 将产品信息字符串添加到订单数据
         };
-  
+
         const response = await Axios.post(
           "http://localhost:3001/checkout",
           orderData,
@@ -71,14 +77,14 @@ export const Cart = () => {
             },
           }
         );
-  
+
         if (response.status === 200) {
           const responseData = response.data;
           const orderNumber = responseData.orderNumber;
           const orderNotes = responseData.orderNotes;
           const totalAmount = responseData.totalAmount;
           const productDetails = responseData.productDetails;
-  
+
           setTimeout(() => {
             alert("成功下單");
             navigate("/checkout", {
@@ -91,10 +97,9 @@ export const Cart = () => {
             });
           }, 500);
 
-          localStorage.removeItem("cartItems")
-          localStorage.removeItem("totalAmount");
-          localStorage.removeItem("productDetails");
-          
+          setCartItems([]);
+          setProductDetails([]);
+          setTotalAmount(0);
         } else {
           console.error("Failed to submit the order");
         }
@@ -105,7 +110,6 @@ export const Cart = () => {
       navigate("/login");
     }
   };
-  
 
   return (
     <div className="cart">
