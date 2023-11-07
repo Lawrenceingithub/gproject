@@ -39,7 +39,7 @@ export const Checkout = () => {
   return (
     <>
       <div className="checkoutcontent">
-        <div className="checkoutcontentdetail">
+        <div className="checkoutcontentdetail" style={{ marginLeft: '550px' }}>
           <h1>订单详情：</h1>
 
           <p>订单号码: {orderNumber}</p>

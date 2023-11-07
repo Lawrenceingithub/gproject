@@ -16,7 +16,7 @@ const connectToDatabase = async () => {
       user: "root",
       host: "localhost",
       password: "QWEasd123",
-      database: "shopdb",
+      database: "employeesystem",
     });
     console.log("數據庫連接成功");
   } catch (error) {
