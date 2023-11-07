@@ -127,26 +127,29 @@ export const Cart = () => {
 
       {totalAmount !== 0 ? (
         <div className="checkout">
+          {isLoggedIn && (
+            <div>
+              <h1>配送方式：</h1>
+              <select onChange={handleDeliveryMethodChange}>
+                <option value="1">送貨：{address}</option>
+                <option value="2">自取：地點1</option>
+                <option value="3">自取：地點2</option>
+              </select>
+              <p>備注：</p>
+              <input
+                type="text"
+                value={orderNotes}
+                onChange={(e) => setOrderNotes(e.target.value)}
+              />
+            </div>
+          )}
           <div>
-            <h1>配送方式：</h1>
-            <select onChange={handleDeliveryMethodChange}>
-              <option value="1">送貨：{address}</option>
-              <option value="2">自取：地點1</option>
-              <option value="3">自取：地點2</option>
-            </select>
-            <h1>備注：</h1>
-            <input
-              type="text"
-              value={orderNotes}
-              onChange={(e) => setOrderNotes(e.target.value)}
-            />
+            <b>
+              <p> 總計: ${totalAmount} </p>
+            </b>
+            <button onClick={() => navigate("/")}> 繼續購物 </button>
+            <button onClick={handleCheckout}> 結算 </button>
           </div>
-
-          <b>
-            <p> 總計: ${totalAmount} </p>
-          </b>
-          <button onClick={() => navigate("/")}> 繼續購物 </button>
-          <button onClick={handleCheckout}> 結算 </button>
         </div>
       ) : (
         <h1>你的購物車沒有任何物品</h1>

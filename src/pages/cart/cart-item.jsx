@@ -13,10 +13,11 @@ export const CartItem = (prop) => {
         <>
         <p>
           <b>名稱: {productname}</b><br/>
-          <b>詳情: {detail}</b>
+          <b>詳情: {detail}</b><br/><br/>
+          <b>價值: ${price}</b>
         </p>
+
         </>
-        <p> 價值: ${price}</p>
         <div className="countHandler">
           <button onClick={() => handleRemoveFromCart(productid)}> - </button>
           <input
