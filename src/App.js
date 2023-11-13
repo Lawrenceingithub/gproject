@@ -11,9 +11,8 @@ import { AuthContextProvider } from "./context/auth-context";
 import { User } from "./pages/user/user";
 import { ProductUpload } from "./pages/shop/productupload";
 import { ProductDetail } from "./pages/shop/productdetail";
-import { Faq } from "./pages/shop/faq";
+import { Faq } from "./pages/user/faq";
 import { Orderhistory } from "./pages/user/orderhistory";
-import { Userinfo } from "./pages/user/userinfo";
 import { Productlist } from "./pages/shop/productlist";
 
 function App() {
@@ -36,7 +35,6 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/productupload" element={<ProductUpload />} />
               <Route path="/user" element={<User />} />
-              <Route path="/userinfo" element={<Userinfo />} />
               <Route path="/orderhistory" element={<Orderhistory />} />
               <Route path="/faq" element={<Faq />} />
 

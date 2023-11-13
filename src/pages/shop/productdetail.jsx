@@ -43,7 +43,9 @@ export const ProductDetail = () => {
   };
 
   if (!productDetail) {
+    <div className="ProductDetail">
     return <h1>產品不存在</h1>;
+    </div>
   }
 
   return (

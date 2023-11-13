@@ -29,9 +29,11 @@ export const Orderhistory = () => {
     <div className="maincontent1">
       <Sidebar />
       {orderHistory.length === 0 ? (
-        <h2>沒有訂單記錄</h2>
-      ) : (
         <div className="maincontent2">
+          <h2>沒有訂單記錄</h2>
+        </div>
+      ) : (
+        <div className="maincontent1">
           {orderHistory.map((order, index) => (
             <div className="maincontent2">
             <div key={index}>

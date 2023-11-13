@@ -50,10 +50,10 @@ export const User = () => {
     }
   };
 
-  const handleSave = async (id) => {
+  const handleSave = async () => {
     try {
       const updatedUser = {
-        userID: id,
+        userID: userID,
         nickname: editedNickname,
         phone: editedPhone,
         address: editedAddress,

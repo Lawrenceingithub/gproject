@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ShopContext } from "../../context/shop-context";
 import { AuthContext } from "../../context/auth-context";
+import { Sidebar } from "../../components/sidebar";
 import "./checkout.css";
 
 export const Checkout = () => {
@@ -32,7 +33,9 @@ export const Checkout = () => {
   
 
   return (
-    <div className="checkoutcontent">
+    <div className="maincontent1">
+      <Sidebar />
+    <div className="maincontent2">
       <h1>订单详情：</h1>
   
       <p>订单号码: {orderNumber}</p>
@@ -66,6 +69,6 @@ export const Checkout = () => {
         返回首頁
       </button>
     </div>
-  );
-  
+    </div>
+    );
 };

@@ -6,7 +6,7 @@ export const Faq = () => {
     <>
       <Sidebar />
       <div className="maincontent">
-      <h3>常見問題</h3>
+      <h2>常見問題</h2>
       </div>
     </>
   );
