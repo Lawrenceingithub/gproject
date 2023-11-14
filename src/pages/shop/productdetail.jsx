@@ -65,7 +65,7 @@ export const ProductDetail = () => {
                 <p>售價 : {productDetail.price}元</p>
                 <p>描述 : {productDetail.detail}</p>
                 <div className="countHandler">
-                  {cartItems[productDetail.productid] <= 0 ? (
+                {!cartItems[productDetail.productid] || cartItems[productDetail.productid] <= 0 ? (
                     <button onClick={handleAddToCartClick}>加入購物車</button>
                   ) : (
                     <>

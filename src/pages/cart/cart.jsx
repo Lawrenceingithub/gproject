@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { getDefaultCart, ShopContext } from "../../context/shop-context";
+import { ShopContext } from "../../context/shop-context";
 import { CartItem } from "./cart-item";
 import { useLocation, useNavigate } from "react-router-dom";
 import Axios from "axios";
@@ -84,6 +84,7 @@ export const Cart = () => {
           const productDetails = responseData.productDetails;
   
           setTimeout(() => {
+            setOrderNotes("");
             alert("成功下單");
             clearCartItems();
             navigate("/checkout", {

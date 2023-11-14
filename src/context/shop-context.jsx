@@ -69,7 +69,11 @@ export const ShopContextProvider = ({ children }) => {
   const handleAddToCart = (productId) => {
     setCartItems((prevCartItems) => {
       const updatedCartItems = { ...prevCartItems };
-      updatedCartItems[productId] += 1;
+      if (updatedCartItems[productId]) {
+        updatedCartItems[productId] += 1;
+      } else {
+        updatedCartItems[productId] = 1;
+      }
       return updatedCartItems;
     });
   };
@@ -77,12 +81,23 @@ export const ShopContextProvider = ({ children }) => {
   const handleRemoveFromCart = (productId) => {
     setCartItems((prevCartItems) => {
       const updatedCartItems = { ...prevCartItems };
-      if (updatedCartItems[productId] > 0) {
+      if (updatedCartItems[productId] && updatedCartItems[productId] > 0) {
         updatedCartItems[productId] -= 1;
+        if (updatedCartItems[productId] === 0) {
+          delete updatedCartItems[productId];
+        }
       }
       return updatedCartItems;
     });
   };
+
+  const handleUpdateCartItemCount = (newAmount, productid) => {
+    const updatedAmount = newAmount === null ? 0 : newAmount;
+    setCartItems((prev) => ({
+    ...prev,
+    [productid]: updatedAmount,
+    }));
+    };
 
   const clearCartItems = () => {
     setCartItems(getDefaultCart());
@@ -107,6 +122,7 @@ export const ShopContextProvider = ({ children }) => {
         handleAddProductDetails,
         handleAddToCart,
         handleRemoveFromCart,
+        handleUpdateCartItemCount,
         clearCartItems,
       }}
     >

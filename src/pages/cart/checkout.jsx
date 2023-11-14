@@ -27,7 +27,7 @@ export const Checkout = () => {
       setOrderNumber(location.state.orderNumber);
       setOrderNotes(location.state.orderNotes);
       setTotalAmount(location.state.totalAmount);
-      setProductDetails(location.state.productDetails); // 提取并分配 productDetails
+      setProductDetails(location.state.productDetails);
     }
   }, [location.state, setOrderNotes, setOrderNumber, setTotalAmount, setProductDetails]);
   
