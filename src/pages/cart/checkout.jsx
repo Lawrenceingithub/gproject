@@ -15,7 +15,7 @@ export const Checkout = () => {
     productDetails,
     setOrderNotes,
     setOrderNumber,
-    settotalAmount,
+    setTotalAmount,
     setProductDetails
   } = useContext(ShopContext);
 
@@ -26,10 +26,10 @@ export const Checkout = () => {
     if (location.state && location.state.orderNumber) {
       setOrderNumber(location.state.orderNumber);
       setOrderNotes(location.state.orderNotes);
-      settotalAmount(location.state.totalAmount);
+      setTotalAmount(location.state.totalAmount);
       setProductDetails(location.state.productDetails); // 提取并分配 productDetails
     }
-  }, [location.state, setOrderNotes, setOrderNumber, settotalAmount, setProductDetails]);
+  }, [location.state, setOrderNotes, setOrderNumber, setTotalAmount, setProductDetails]);
   
 
   return (

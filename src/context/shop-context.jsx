@@ -12,30 +12,24 @@ export const getDefaultCart = () => {
 };
 
 export const ShopContextProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(getDefaultCart());
+  const [cartItems, setCartItems] = useState(() => {
+    const storedCart = localStorage.getItem("cartItems");
+    if (storedCart) {
+      return JSON.parse(storedCart);
+    } else {
+      return getDefaultCart();
+    }
+  });
+
   const [deliveryMethod, setDeliveryMethod] = useState("1");
   const [orderNotes, setOrderNotes] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
   const [products, setProducts] = useState([]);
   const [productDetails, setProductDetails] = useState(""); // 添加 productDetails
-  const [totalAmount, settotalAmount] = useState(() => {
+  const [totalAmount, setTotalAmount] = useState(() => {
     const storedTotalAmount = localStorage.getItem("totalAmount");
     return storedTotalAmount ? parseFloat(storedTotalAmount) : 0;
   });
-
-  useEffect(() => {
-    const storedCart = localStorage.getItem("cartItems");
-    if (storedCart) {
-      const parsedCart = JSON.parse(storedCart);
-      const sanitizedCart = {};
-      for (const key in parsedCart) {
-        sanitizedCart[key] = parseInt(parsedCart[key], 10) || 0;
-      }
-      setCartItems(sanitizedCart);
-    } else {
-      setCartItems(getDefaultCart());
-    }
-  }, []); // 使用空的依赖项数组
 
   // 在 cartItems 变化时更新 localStorage
   useEffect(() => {
@@ -46,7 +40,7 @@ export const ShopContextProvider = ({ children }) => {
   useEffect(() => {
     if (cartItems && products.length > 0) {
       let totalAmount = 0;
-      let updatedProductDetails = ""; // 添加一个变量来保存更新的 productDetails
+      let updatedProductDetails = "";
   
       Object.keys(cartItems).forEach((productid) => {
         const productIdNumber = productid;
@@ -60,66 +54,62 @@ export const ShopContextProvider = ({ children }) => {
         }
       });
   
-      settotalAmount(totalAmount);
+      setTotalAmount(totalAmount);
       setProductDetails(updatedProductDetails); // 更新 productDetails
       localStorage.setItem("totalAmount", totalAmount.toString());
       localStorage.setItem("productDetails", updatedProductDetails); // 也保存到本地存储
     }
-  }, [cartItems, products, settotalAmount, setProductDetails]);
+  }, [cartItems, products, setTotalAmount, setProductDetails]);
 
   // 处理添加产品信息的函数
   const handleAddProductDetails = (details) => {
     setProductDetails(details);
   };
 
-  const handleAddToCart = (productid) => {
-    // 更新购物车中商品数量的逻辑
-    const updatedAmount = parseInt(cartItems[productid] || 0, 10) + 1;
-    setCartItems((prev) => ({
-      ...prev,
-      [productid]: updatedAmount,
-    }));
+  const handleAddToCart = (productId) => {
+    setCartItems((prevCartItems) => {
+      const updatedCartItems = { ...prevCartItems };
+      updatedCartItems[productId] += 1;
+      return updatedCartItems;
+    });
   };
 
-  const handleRemoveFromCart = (productid) => {
-    // 更新购物车中商品数量的逻辑
-    const updatedAmount = cartItems[productid] === null ? 0 : cartItems[productid] - 1;
-    setCartItems((prev) => ({
-      ...prev,
-      [productid]: updatedAmount,
-    }));
+  const handleRemoveFromCart = (productId) => {
+    setCartItems((prevCartItems) => {
+      const updatedCartItems = { ...prevCartItems };
+      if (updatedCartItems[productId] > 0) {
+        updatedCartItems[productId] -= 1;
+      }
+      return updatedCartItems;
+    });
   };
 
-  const handleUpdateCartItemCount = (newAmount, productid) => {
-    const updatedAmount = newAmount === null ? 0 : newAmount;
-    setCartItems((prev) => ({
-      ...prev,
-      [productid]: updatedAmount,
-    }));
-  };
-
-  const contextValue = {
-    cartItems,
-    handleAddToCart,
-    handleUpdateCartItemCount,
-    handleRemoveFromCart,
-    deliveryMethod,
-    orderNotes,
-    orderNumber, // 将 orderNumber 包括在 contextValue
-    products,
-    totalAmount,
-    productDetails,
-    setDeliveryMethod,
-    setOrderNotes,
-    setOrderNumber, // 设置 setOrderNumber 函数
-    setProducts,
-    settotalAmount,
-    setProductDetails,
-    handleAddProductDetails, // 将 handleAddProductDetails 包括在 contextValue
+  const clearCartItems = () => {
+    setCartItems(getDefaultCart());
   };
 
   return (
-    <ShopContext.Provider value={contextValue}>
+    <ShopContext.Provider
+      value={{
+        cartItems,
+        deliveryMethod,
+        orderNotes,
+        orderNumber,
+        products,
+        productDetails,
+        totalAmount,
+        setProductDetails,
+        setTotalAmount,
+        setDeliveryMethod,
+        setOrderNotes,
+        setOrderNumber,
+        setProducts,
+        handleAddProductDetails,
+        handleAddToCart,
+        handleRemoveFromCart,
+        clearCartItems,
+      }}
+    >
       {children}
     </ShopContext.Provider>
   );

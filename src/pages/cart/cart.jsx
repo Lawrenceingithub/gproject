@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { ShopContext } from "../../context/shop-context";
+import { getDefaultCart, ShopContext } from "../../context/shop-context";
 import { CartItem } from "./cart-item";
 import { useLocation, useNavigate } from "react-router-dom";
 import Axios from "axios";
@@ -26,6 +26,7 @@ export const Cart = () => {
     setTotalAmount,
     setOrderNumber,
     setProductDetails,
+    clearCartItems,
     cartItems,
   } = shopContext;
 
@@ -58,9 +59,10 @@ export const Cart = () => {
           orderNotes: orderNotes,
           deliveryMethod: deliveryMethod,
           totalAmount: totalAmount,
-          productDetails: productDetails, // 将产品信息字符串添加到订单数据
+          productDetails: productDetails,
         };
   
+        
         console.log("orderData的值", orderData);
         console.log("productDetails的值", productDetails);
   
@@ -83,15 +85,17 @@ export const Cart = () => {
   
           setTimeout(() => {
             alert("成功下單");
+            clearCartItems();
             navigate("/checkout", {
               state: {
                 orderNumber,
                 orderNotes,
                 totalAmount,
-                productDetails, // 将 productDetails 包括在 location.state 中
+                productDetails,
               },
             });
           }, 500);
+
         } else {
           console.error("Failed to submit the order");
         }
