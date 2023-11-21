@@ -34,26 +34,29 @@ export const Orderhistory = () => {
         </div>
       ) : (
         <div className="maincontent1">
-          {orderHistory.map((order, index) => (
-            <div className="maincontent2">
-            <div key={index}>
-              <h2>訂單資料：</h2>
-              <h4>订单号码: {order.orderNumber}</h4>
-              <h4>用户名：{username}</h4>
-              <h4>电话：{phone}</h4>
-              <h4>
-                配送方式:{" "}
-                {order.deliveryMethod === "1"
-                  ? `送货：${address}`
-                  : order.deliveryMethod === "2"
-                  ? "自取：地點1"
-                  : "自取：地點2"}
-              </h4>
-              <h4>备注：{order.orderNotes}</h4>
-              <h4>总计: ${order.totalAmount}</h4>
-              <h4>产品詳情: {order.productDetails}</h4>
-            </div>
-          </div>))}
+{orderHistory.map((order, index) => (
+  <div className="maincontent2" key={index}>
+    <h2>訂單資料：</h2>
+    <div>
+      <h4>订单号码: {order.orderNumber}</h4>
+      <h4>用户名：{username}</h4>
+      <h4>电话：{phone}</h4>
+      <h4>
+        配送方式:{" "}
+        {order.deliveryMethod === 1
+            ? `送货：${address}`
+            : order.deliveryMethod === 2
+            ? "自取：地點1"
+            : order.deliveryMethod === 3
+            ? "自取：地點2"
+            : ""}
+      </h4>
+      <h4>备注：{order.orderNotes}</h4>
+      <h4>总计: ${order.totalAmount}</h4>
+      <h4>产品詳情: {order.productDetails}</h4>
+    </div>
+  </div>
+))}
         </div>
       )}
     </div>

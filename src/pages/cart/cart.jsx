@@ -62,10 +62,6 @@ export const Cart = () => {
           productDetails: productDetails,
         };
   
-        
-        console.log("orderData的值", orderData);
-        console.log("productDetails的值", productDetails);
-  
         const response = await Axios.post(
           "http://localhost:3001/checkout",
           orderData,

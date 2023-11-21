@@ -8,23 +8,20 @@ export const Productlist = () => {
   const { handleAddToCart, cartItems, products, setProducts } =
     useContext(ShopContext);
 
-    useEffect(() => {
-      Axios.get("http://localhost:3001/productlist")
-        .then((response) => {
-          setProducts(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching products:", error);
-        });
-    }, [setProducts]);
+  useEffect(() => {
+    Axios.get("http://localhost:3001/productlist")
+      .then((response) => {
+        setProducts(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      });
+  }, [setProducts]);
 
   const handleAddToCartClick = (productid) => {
-   
-      handleAddToCart(productid);
-
+    handleAddToCart(productid);
   };
-  
-  
+
 
   return (
     <div className="productlist">
