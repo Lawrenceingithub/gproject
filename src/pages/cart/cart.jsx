@@ -35,9 +35,9 @@ export const Cart = () => {
       setOrderNumber(location.state.orderNumber);
       setOrderNotes(location.state.orderNotes);
       setTotalAmount(location.state.totalAmount);
-      setProductDetails (location.state.productDetails)
+      setProductDetails (location.state.productDetails);
     }
-  }, [location.state, setOrderNotes, setOrderNumber, setTotalAmount, productDetails]);
+  }, [location.state, setOrderNotes, setOrderNumber, setTotalAmount, setProductDetails, productDetails]);
 
   const handleDeliveryMethodChange = (e) => {
     const selectedDeliveryMethod = e.target.value;
@@ -124,9 +124,9 @@ export const Cart = () => {
           <div>
             <h1>配送方式：</h1>
             <select onChange={handleDeliveryMethodChange}>
-              <option value="1">送貨：{address}</option>
-              <option value="2">自取：地點1</option>
-              <option value="3">自取：地點2</option>
+              <option value={1}>送貨：{address}</option>
+              <option value={2}>自取：地點1</option>
+              <option value={3}>自取：地點2</option>
             </select>
             <h1>備注：</h1>
             <input

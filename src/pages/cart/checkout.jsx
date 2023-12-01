@@ -44,11 +44,11 @@ export const Checkout = () => {
   
       <p>
         配送方式:{" "}
-        {deliveryMethod === 1
+        {deliveryMethod === "1"
           ? `送货：${address}`
-          : deliveryMethod === 2
+          : deliveryMethod === "2"
           ? "自取：地點1"
-          : deliveryMethod === 3
+          : deliveryMethod === "3"
           ? "自取：地點2"
           : ""}
       </p>

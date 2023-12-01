@@ -94,10 +94,10 @@ export const ShopContextProvider = ({ children }) => {
   const handleUpdateCartItemCount = (newAmount, productid) => {
     const updatedAmount = newAmount === null ? 0 : newAmount;
     setCartItems((prev) => ({
-    ...prev,
-    [productid]: updatedAmount,
+      ...prev,
+      [productid]: updatedAmount,
     }));
-    };
+  };
 
   const clearCartItems = () => {
     setCartItems(getDefaultCart());
