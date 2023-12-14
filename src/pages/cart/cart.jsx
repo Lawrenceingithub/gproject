@@ -51,7 +51,6 @@ export const Cart = () => {
   const handleCheckout = async () => {
     if (isLoggedIn) {
       try{
-        // 确保使用来自 ShopContext 的 productDetails
         const orderData = {
           orderNumber: orderNumber,
           userID: userID,

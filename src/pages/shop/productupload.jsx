@@ -36,7 +36,9 @@ export const ProductUpload = () => {
     }
   };
 
-  const handleUpload = async () => {
+  const handleUpload = async (event) => {
+    event.preventDefault();
+    
     try {
       const productId = uuidv4(); // 使用 UUID 作为产品ID
 
@@ -77,7 +79,7 @@ export const ProductUpload = () => {
       <Sidebar />
       <div className="maincontent">
         <h2>产品上传</h2>
-        <form encType="multipart/form-data">
+        <form encType="multipart/form-data" onSubmit={handleUpload}>
           <div>
             <label>产品名称: </label>
             <input

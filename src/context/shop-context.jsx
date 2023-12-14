@@ -21,7 +21,7 @@ export const ShopContextProvider = ({ children }) => {
     }
   });
 
-  const [deliveryMethod, setDeliveryMethod] = useState("");
+  const [deliveryMethod, setDeliveryMethod] = useState("1");
   const [orderNotes, setOrderNotes] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
   const [products, setProducts] = useState([]);
